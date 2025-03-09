@@ -1,0 +1,25 @@
+{
+  "workbench.colorTheme": "Abyss",
+  //turn off copilot for go
+  // "github.copilot.editor.enableAutoCompletions": false,
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#fb9c9f",
+    "activityBar.background": "#fb9c9f",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#097b05",
+    "activityBarBadge.foreground": "#e7e7e7",
+    "commandCenter.border": "#15202b99",
+    "sash.hoverBorder": "#fb9c9f",
+    "statusBar.background": "#f96b6f",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#f73a3f",
+    "statusBarItem.remoteBackground": "#f96b6f",
+    "statusBarItem.remoteForeground": "#15202b",
+    "titleBar.activeBackground": "#f96b6f",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#f96b6f99",
+    "titleBar.inactiveForeground": "#15202b99"
+  },
+  "peacock.color": "f96b6f"
+}

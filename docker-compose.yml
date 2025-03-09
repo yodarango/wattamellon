@@ -1,86 +1,40 @@
-# services:
-#   wattamellon_web:
-#     build: .
-#     container_name: wattamellon_web
-#     ports:
-#       - "8007:5173"
-#       - "8008:3000"
-#     depends_on:
-#       - wattamellon_db
-#     environment:
-#       - DB_HOST=${DB_HOST}
-#       - DB_USER=${DB_USER}
-#       - DB_PASSWORD=${DB_PASS}
-#       - DB_NAME=${DB_NAME}
-#     volumes:
-#       - .:/app
-#     restart: always
-
-#   wattamellon_db:
-#     image: mysql:8.0
-#     container_name: wattamellon_db
-#     restart: always
-#     # environment:
-#     #   MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-#     #   MYSQL_DATABASE: ${MYSQL_DATABASE}
-#     # environment:
-#     #   - DB_PASSWORD=${DB_PASS}
-#     #   - DB_NAME=${DB_NAME}
-#     ports:
-#       - "3307:3306"
-#       # saved in the docker volume not my local machine
-#     volumes:
-#       - db_data:/var/lib/mysql
-
-# volumes:
-#   db_data:
+version: "3.8"
 
 services:
-  wattamellon_web:
-    build:
-      context: ./web
-      dockerfile: Dockerfile
-    container_name: wattamellon_web
-    environment:
-      - VITE_API_URL=http://wattamellon_api:3000
+  wattamellon_app:
+    build: .
+    container_name: ${COMPOSE_PROJECT_NAME}
     ports:
-      - "8007:5173"
-    depends_on:
-      - wattamellon_api
-    volumes:
-      - ./web/src:/app/src
-      - ./web/public:/app/public
-    restart: always
-
-  wattamellon_api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: wattamellon_api
-    ports:
-      - "8008:3000"
-    depends_on:
-      - wattamellon_db
+      - "8008:8008"
     environment:
       - DB_HOST=${DB_HOST}
       - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASS}
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
+    depends_on:
+      - wattamellon_mysql
+    networks:
+      - app-network
     volumes:
-      - ./src:/app/src
-    restart: always
+      - .:/app
 
-  wattamellon_db:
+  wattamellon_mysql:
     image: mysql:8.0
-    container_name: wattamellon_db
-    restart: always
+    container_name: wattamellon_mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
-      - "3307:3306"
-    volumes:
-      - db_data:/var/lib/mysql
+      - "3306:3306"
+    networks:
+      - app-network
 
+    volumes:
+      - mysql_data:/var/lib/mysql # Persistent storage for MySQL data
+
+networks:
+  app-network:
+    driver: bridge
 volumes:
-  db_data:
+  mysql_data:
+    driver: local

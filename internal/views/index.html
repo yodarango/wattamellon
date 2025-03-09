@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create a Game</title>
+    <style>
+      #game-container,
+      #game-container-done,
+      #game-container-submitted {
+        display: none;
+      }
+    </style>
+    <script src="/public/categories_db.js"></script>
+  </head>
+  <body>
+    <!-- This is the form to create a new game -->
+    <div id="create-form">
+      <h1>Create a Game</h1>
+      <input type="text" id="name" placeholder="Game Name" />
+      <input type="text" id="player_name" placeholder="Your Name" />
+      <!-- Not allowing users to pick size for now -->
+      <input type="hidden" id="size" value="50" />
+      <h3>Select Thumbnail</h3>
+      <div id="thumbnails">
+        <label>
+          <input type="radio" name="thumbnail" value="thumb1.png" /> Thumb 1
+        </label>
+        <label>
+          <input type="radio" name="thumbnail" value="thumb2.png" /> Thumb 2
+        </label>
+      </div>
+      <button onclick="createGame()">Save Game</button>
+    </div>
+
+    <!-- this is the game session -->
+    <div id="game-container"></div>
+
+    <!-- this is the finished game session -->
+    <div id="game-container-done">
+      <h2>Game Complete!</h2>
+      <button onclick="submitGame()">Submit Answers</button>
+    </div>
+
+    <!-- The game has been submitted. There is nothing else to see here  -->
+    <div id="game-container-submitted">
+      <h2>Game Submitted!</h2>
+      <button onclick="navigateToView()">See who has answered id</button>
+    </div>
+    <script>
+      // get and return the game token
+      function getGameToken() {
+        let gameToken = localStorage.getItem("wattamellon_token");
+        gameToken = JSON.parse(gameToken || "{}");
+        return gameToken;
+      }
+
+      // get two random options from a list of options
+      function getRandomOptions(options) {
+        const keys = Object.keys(options);
+        shuffleArray(keys);
+        return keys
+          .slice(0, 2)
+          .map((key) => ({ id: key, value: options[key] }));
+      }
+
+      // suffle the questions so the never get them in the same order
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+
+      function navigateToView() {
+        const { gameId, creatorToken } = getGameToken();
+        window.location.href = "/view/" + gameId;
+      }
+
+      // creates a new game
+      async function createGame() {
+        // Generates a random token for the game
+        function generateToken() {
+          let token = "";
+          const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+          for (let i = 0; i < 25; i++) {
+            token += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return token;
+        }
+
+        // gets the current values set in the form to createa a game
+        function getFormValues() {
+          const thumbnail =
+            document.querySelector('input[name="thumbnail"]:checked')?.value ||
+            "default.png";
+          const name = document.getElementById("name").value;
+          const playerName = document.getElementById("player_name").value;
+          const size = document.getElementById("size").value;
+
+          return { thumbnail, playerName, size, name };
+        }
+
+        const { name, playerName, size, thumbnail } = getFormValues();
+        const creatorToken = generateToken();
+
+        // alert the user if they have not selected a thumbnail or have not entered a name
+        if (!thumbnail) {
+          alert("Please select a thumbnail");
+          return;
+        }
+        if (!name) {
+          alert("Please enter a name for this game");
+          return;
+        }
+        if (!playerName) {
+          alert("Please enter your name");
+          return;
+        }
+
+        const gameToken = getGameToken();
+        const categorieKeys = Object.keys(categories);
+        shuffleArray(categorieKeys);
+
+        const emtpyQuestions = categorieKeys.reduce((acc, key) => {
+          acc[key] = "";
+          return acc;
+        }, {});
+
+        const res = await fetch("/new-game", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            creator_token: creatorToken,
+            player_name: playerName,
+            size: Number(size),
+            questions: {},
+            thumbnail,
+            name,
+          }),
+        });
+
+        const { data, success } = await res.json();
+
+        if (success) {
+          // update the game token with the order of the questions
+          if (!(Object.keys(gameToken.questions || {}) > 0)) {
+            updateGameToken({
+              creator_token: data.creator_token,
+              questions: emtpyQuestions,
+              game_id: data.id,
+              currentIndex: 0,
+            });
+          }
+
+          // hide and show the right element after the game is created successfully
+          document.getElementById("create-form").style.display = "none";
+          document.getElementById("game-container").style.display = "block";
+        } else {
+          alert("Error creating game: " + data.error);
+        }
+      }
+
+      // responsible for rendering the intial car state and keeping state of the current question and the next selection
+      function renderCards() {
+        const gameToken = getGameToken();
+        const categorieKeys = Object.keys(gameToken.questions);
+
+        let currentIndex = gameToken.currentIndex;
+
+        const container = document.getElementById("game-container");
+        const containerDone = document.getElementById("game-container-done");
+
+        function showNextQuestion() {
+          if (currentIndex >= categorieKeys.length) {
+            renderView("done");
+            return;
+          }
+
+          const categoryKey = categorieKeys[currentIndex];
+
+          const { question, options } = categories[categoryKey];
+          const selectedOptions = getRandomOptions(options);
+
+          container.innerHTML = `<h3>${question}</h3>`;
+          selectedOptions.forEach((option) => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.textContent = option.value;
+            card.onclick = () => {
+              gameToken.questions[categoryKey] = option.id;
+              gameToken.currentIndex = currentIndex++;
+              gameToken.is_complete = currentIndex >= categorieKeys.length;
+              updateGameToken(gameToken);
+              showNextQuestion();
+            };
+            container.appendChild(card);
+          });
+        }
+        showNextQuestion();
+      }
+
+      // the user has answered all the questions and is ready to submit the game
+      async function submitGame() {
+        const res = await fetch("/submit-game-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            game_id: gameId,
+            player_token: creatorToken,
+            answers: JSON.stringify(answers),
+            success_rate: Math.round((Object.keys(answers).length / 50) * 100),
+            is_completed: true,
+          }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert("Game completed! Score: " + data.data.success_rate + "%");
+          localStorage.removeItem("game_id");
+          localStorage.removeItem("creator_token");
+          localStorage.removeItem("answers");
+          window.location.href = "/view/" + gameId;
+        } else {
+          alert("Error submitting game.");
+        }
+      }
+
+      // this chooses what view to render based on the view passed
+      function renderView(view) {
+        switch (view) {
+          case "create":
+            document.getElementById("create-form").style.display = "block";
+            document.getElementById("game-container").style.display = "none";
+            document.getElementById("game-container-done").style.display =
+              "none";
+            break;
+          case "game":
+            document.getElementById("create-form").style.display = "none";
+            document.getElementById("game-container").style.display = "block";
+            document.getElementById("game-container-done").style.display =
+              "none";
+            break;
+          case "done":
+            document.getElementById("create-form").style.display = "none";
+            document.getElementById("game-container").style.display = "none";
+            document.getElementById("game-container-done").style.display =
+              "block";
+            break;
+
+          default:
+            break;
+        }
+      }
+
+      function updateGameToken(token) {
+        localStorage.setItem("wattamellon_token", JSON.stringify(token));
+      }
+      // Three screens are possible, the create a new game screen OR the create a new session screen OR the game is done
+      document.addEventListener("DOMContentLoaded", () => {
+        const gameToken = getGameToken();
+        if (gameToken.game_id) {
+          if (gameToken.is_complete) {
+            renderView("done");
+            return;
+          }
+
+          if (gameToken.is_submitted) {
+            renderView("submitted");
+            return;
+          }
+          renderView("game");
+          renderCards();
+        } else {
+          renderView("create");
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Play Game</title>
+    <script>
+      const gameId = window.location.pathname.split("/").pop();
+      let questions = [];
+      let answers = {};
+      let index = 0;
+      let playerToken = Math.random().toString(36).substring(2, 27);
+
+      async function startGame() {
+        const res = await fetch("/public/categories.json");
+        const data = await res.json();
+        questions = Object.keys(data)
+          .flatMap((cat) =>
+            Object.entries(data[cat].options).map(([uid, opt]) => ({
+              question: data[cat].question,
+              option1: opt,
+              option2: "",
+            }))
+          )
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 50);
+        showQuestion();
+      }
+
+      function showQuestion() {
+        if (index >= questions.length) return submitGame();
+        const q = questions[index];
+        document.getElementById("question").innerText = q.question;
+        document.getElementById("option1").innerText = q.option1;
+        document.getElementById("option2").innerText = q.option2;
+      }
+
+      function selectOption(opt) {
+        answers[index] = opt;
+        index++;
+        showQuestion();
+      }
+
+      async function submitGame() {
+        const correct = Object.values(answers).filter(
+          (a) => a === "correct"
+        ).length;
+        const successRate = Math.round((correct / questions.length) * 100);
+
+        const res = await fetch("/submit-game-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            game_id: gameId,
+            player_token: playerToken,
+            answers: JSON.stringify(answers),
+            success_rate: successRate,
+            is_completed: true,
+          }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert("Game completed! Your score: " + successRate + "%");
+          window.location.href = "/view/" + gameId;
+        } else {
+          alert("Error submitting game session.");
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Play Game</h1>
+    <h2 id="question">Click "Start" to begin</h2>
+    <button id="option1" onclick="selectOption('left')"></button>
+    <button id="option2" onclick="selectOption('right')"></button>
+    <button onclick="startGame()">Start Game</button>
+  </body>
+</html>
