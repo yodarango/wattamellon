@@ -18,6 +18,8 @@ func Router () *http.ServeMux{
 
 	// POST
 	mux.HandleFunc("/new-game", NewGame)
+	// POST 
+	mux.HandleFunc("/complete-game", CompleteGame)
 	// POST
 	mux.HandleFunc("/new-game-session", NewGameSession)
 	// UPDATE
@@ -25,9 +27,9 @@ func Router () *http.ServeMux{
 	// GET
 	mux.HandleFunc("/", GetHomePage)
 	// GET
-	mux.HandleFunc("/get-game-session/", GetGameSession) // where the last item is the id of the game session
+	mux.HandleFunc("/play/", GetGameSession) // where the last item is the id of the game session
 	// GET
-	mux.HandleFunc("/get-game-session-for-game/", GetGameSessionsByGameId) // where the last item is the id of the actual game
+	mux.HandleFunc("/view/", GetGameSessionsByGameId) // where the last item is the id of the actual game
 
 
 	return mux
@@ -39,9 +41,10 @@ type Game struct {
 	PlayerName   string    `json:"player_name"`
 	Size         int       `json:"size"`
 	CreatorToken string    `json:"creator_token"`
-	Questions    map[string]interface{}    `json:"questions"` 
+	Questions    string   `json:"questions"` 
 	Thumbnail string 	     `json:"thumbnail"`
 	Created      string    `json:"created"`
+	IsCompleted  bool      `json:"is_complete"`
 }
 
 type GameSession struct {
@@ -93,8 +96,6 @@ func NewGame(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 
-	questionString := fmt.Sprintf("%v", game.Questions)
-
 	query := `
 		INSERT INTO games (
 			name, player_name, size, thumbnail, creator_token, questions
@@ -102,7 +103,68 @@ func NewGame(w http.ResponseWriter, r *http.Request){
 		VALUES(?,?,?,?,?,?);
 	`
 
-	result, err := RouterConfig.DB.Conn.Exec(query, game.Name, game.PlayerName, game.Size, game.Thumbnail, game.CreatorToken, questionString)
+	result, err := RouterConfig.DB.Conn.Exec(query, game.Name, game.PlayerName, game.Size, game.Thumbnail, game.CreatorToken, game.Questions)
+
+	if err != nil {
+		response.Error = fmt.Sprintf("error creating game %v", err)
+		response.Success = false
+		response.Data = nil
+
+		json.NewEncoder(w).Encode(response)
+		fmt.Println("Could not create game" ,err)
+		return 
+	}
+
+	lastId, _ := result.LastInsertId()
+
+
+	game.ID = int(lastId)
+
+	response.Success = true
+	response.Data = game
+	response.Error = ""
+
+	json.NewEncoder(w).Encode(response)
+}
+
+func CompleteGame(w http.ResponseWriter, r *http.Request){ 
+
+	var response HttpResponse
+	var game Game
+
+	w.Header().Set("Content-Type", "application/json")
+
+	buffer, err := io.ReadAll(r.Body)
+
+	if err != nil {
+		response.Error = fmt.Sprintf("error reading buffer %v", err)
+		response.Success = false
+		response.Data = nil
+
+		json.NewEncoder(w).Encode(response)
+		fmt.Println("Could not bufferize body" ,err)
+		return 
+	}
+
+	defer r.Body.Close()
+
+	err = json.Unmarshal(buffer, &game)
+
+	if err != nil {
+		response.Error = fmt.Sprintf("error unmarshalling buffer %v", err)
+		response.Success = false
+		response.Data = nil
+
+		json.NewEncoder(w).Encode(response)
+		fmt.Printf("could not unmarshall body %v" ,err)
+		return 
+	}
+
+	query := `
+		UPDATE games set questions = ?, is_complete = true WHERE id = ?;
+	`
+
+	result, err := RouterConfig.DB.Conn.Exec(query, game.Questions, game.ID)
 
 	if err != nil {
 		response.Error = fmt.Sprintf("error creating game %v", err)
@@ -314,12 +376,13 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 
 func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 	var response HttpResponse
+	var game Game
 
 	path := strings.Split(r.URL.Path, "/")
 	gameId := path[len(path) - 1]
 
 
-	w.Header().Set("Content-Type", "application/json")
+	// w.Header().Set("Content-Type", "application/json")
 
 	query := `SELECT id, game_id, player_token, answers, is_completed, success_rate, created FROM game_sessions WHERE game_id = ?;`
 
@@ -364,20 +427,45 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 		gameSessions = append(gameSessions, gameSession)
 	}
 
-	response.Data = gameSessions
+	row := RouterConfig.DB.Conn.QueryRow(`SELECT name, player_name, size, thumbnail, creator_token, questions, created, is_complete FROM games WHERE id = ?;`, gameId)
+
+	err = row.Scan(
+		&game.Name,
+		&game.PlayerName,
+		&game.Size,
+		&game.Thumbnail,
+		&game.CreatorToken,
+		&game.Questions,
+		&game.Created,
+		&game.IsCompleted)
+
+	if err != nil {
+		fmt.Println("Could not get game", err)
+		response.Error = fmt.Sprintf("error getting game %v", err)
+		response.Success = false
+		response.Data = nil
+		return 
+	}
+
+	response.Data = map[string]interface{}{
+		"Sessions": gameSessions,
+		"Game": game,
+	}
+
 	response.Success = true
 	response.Error = ""
 
 	// uncoment if i decide to make it an API
 	// json.NewEncoder(w).Encode(response)
 
+	// add the response to the template
 	temp, err := template.ParseFiles("internal/views/view.html")
 
 	if err != nil {
 		fmt.Println("Unable to parse file")
 	}
 
-	err = temp.Execute(w, nil)
+	err = temp.Execute(w, response.Data)
 	
 	if err != nil {
 		fmt.Println("Unable to execute file")

@@ -58,15 +58,16 @@
       document.addEventListener("DOMContentLoaded", () => {
         const gameToken = getGameToken();
         if (gameToken.game_id) {
+          if (gameToken.is_submitted) {
+            renderView("submitted");
+            return;
+          }
+
           if (gameToken.is_complete) {
             renderView("done");
             return;
           }
 
-          if (gameToken.is_submitted) {
-            renderView("submitted");
-            return;
-          }
           renderView("game");
         } else {
           renderView("create");
@@ -107,8 +108,8 @@
        * Navigate to the view page
        * **********************************************************************************************/
       function navigateToView() {
-        const { gameId, creatorToken } = getGameToken();
-        window.location.href = "/view/" + gameId;
+        const { game_id, creatorToken } = getGameToken();
+        window.location.href = "/view/" + game_id;
       }
 
       /*************************************************************************************************
@@ -171,7 +172,7 @@
             creator_token: creatorToken,
             player_name: playerName,
             size: Number(size),
-            questions: {},
+            questions: "{}",
             thumbnail,
             name,
           }),
@@ -225,7 +226,17 @@
           const { question, options } = categories[categoryKey];
           const selectedOptions = getRandomOptions(options);
 
-          container.innerHTML = `<h3>${question}</h3>`;
+          container.innerHTML = "";
+          const h4 = document.createElement("h4");
+          h4.textContent = `Question ${currentIndex + 1} of ${
+            categorieKeys.length
+          }`;
+          container.appendChild(h4);
+
+          const h3 = document.createElement("h3");
+          h3.textContent = question;
+          container.appendChild(h3);
+
           selectedOptions.forEach((option) => {
             const card = document.createElement("div");
             card.className = "card";
@@ -251,25 +262,34 @@
        * and if successful, it will alert the user and redirect them to the view page
        * **********************************************************************************************/
       async function submitGame() {
-        const res = await fetch("/submit-game-session", {
+        // check that the user has answered all the questions
+
+        const gameToken = getGameToken();
+        const { creator_token, game_id, questions, is_complete } = gameToken;
+
+        if (!is_complete) {
+          alert("Please answer all the questions before submitting");
+          return;
+        }
+        const res = await fetch("/complete-game", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            game_id: gameId,
-            player_token: creatorToken,
-            answers: JSON.stringify(answers),
-            success_rate: Math.round((Object.keys(answers).length / 50) * 100),
+            id: game_id,
+            creator_token,
+            questions: JSON.stringify(questions),
             is_completed: true,
           }),
         });
 
         const data = await res.json();
         if (data.success) {
-          alert("Game completed! Score: " + data.data.success_rate + "%");
-          localStorage.removeItem("game_id");
-          localStorage.removeItem("creator_token");
-          localStorage.removeItem("answers");
-          window.location.href = "/view/" + gameId;
+          gameToken.is_submitted = true;
+          updateGameToken(gameToken);
+
+          alert("Game submitted! You can now view the results.");
+          renderView("submitted");
+          //     window.location.href = "/view/" + game_id;
         } else {
           alert("Error submitting game.");
         }
@@ -285,11 +305,15 @@
             document.getElementById("game-container").style.display = "none";
             document.getElementById("game-container-done").style.display =
               "none";
+            document.getElementById("game-container-submitted").style.display =
+              "none";
             break;
           case "game":
             document.getElementById("create-form").style.display = "none";
             document.getElementById("game-container").style.display = "block";
             document.getElementById("game-container-done").style.display =
+              "none";
+            document.getElementById("game-container-submitted").style.display =
               "none";
             renderCards();
             break;
@@ -298,7 +322,17 @@
             document.getElementById("game-container").style.display = "none";
             document.getElementById("game-container-done").style.display =
               "block";
+            document.getElementById("game-container-submitted").style.display =
+              "none";
             break;
+
+          case "submitted":
+            document.getElementById("create-form").style.display = "none";
+            document.getElementById("game-container").style.display = "none";
+            document.getElementById("game-container-done").style.display =
+              "none";
+            document.getElementById("game-container-submitted").style.display =
+              "block";
 
           default:
             break;
