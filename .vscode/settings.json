@@ -1,5 +1,5 @@
 {
-  "workbench.colorTheme": "Abyss",
+  "workbench.colorTheme": "Lightheaded",
   //turn off copilot for go
   // "github.copilot.editor.enableAutoCompletions": false,
   "workbench.colorCustomizations": {
@@ -20,6 +20,27 @@
     "titleBar.activeForeground": "#15202b",
     "titleBar.inactiveBackground": "#f96b6f99",
     "titleBar.inactiveForeground": "#15202b99"
+  },
+  // increase indentation size
+  "editor.tabSize": 6,
+  "editor.detectIndentation": false,
+  "editor.insertSpaces": true,
+  //   "editor.renderIndentGuides": true,
+  "editor.renderWhitespace": "all",
+  //   "editor.rulers": [80, 120],
+  "editor.wordWrap": "on",
+  "editor.wordWrapColumn": 160,
+  "editor.wrappingIndent": "same",
+  // comments color
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "comment",
+        "settings": {
+          "foreground": "#8dffecca"
+        }
+      }
+    ]
   },
   "peacock.color": "f96b6f"
 }

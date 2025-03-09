@@ -48,14 +48,44 @@
       <button onclick="navigateToView()">See who has answered id</button>
     </div>
     <script>
-      // get and return the game token
+      /*************************************************************************************************
+       * Four screens are possible:
+       * 1. Create a game (default)
+       * 2. Play the game (the user ahs submitted the game information)
+       * 3. Game is done (the user has answered all the questions but not submitted)
+       * 4. Game is submitted (the user has submitted the game)
+       * *****************************************************************************/
+      document.addEventListener("DOMContentLoaded", () => {
+        const gameToken = getGameToken();
+        if (gameToken.game_id) {
+          if (gameToken.is_complete) {
+            renderView("done");
+            return;
+          }
+
+          if (gameToken.is_submitted) {
+            renderView("submitted");
+            return;
+          }
+          renderView("game");
+          renderCards();
+        } else {
+          renderView("create");
+        }
+      });
+
+      /*************************************************************************************************
+       * Get and return the game token from the local storage
+       * **********************************************************************************************/
       function getGameToken() {
         let gameToken = localStorage.getItem("wattamellon_token");
         gameToken = JSON.parse(gameToken || "{}");
         return gameToken;
       }
 
-      // get two random options from a list of options
+      /*************************************************************************************************
+       * Give me an array and I will return a random selection of 2 options
+       * **********************************************************************************************/
       function getRandomOptions(options) {
         const keys = Object.keys(options);
         shuffleArray(keys);
@@ -64,7 +94,9 @@
           .map((key) => ({ id: key, value: options[key] }));
       }
 
-      // suffle the questions so the never get them in the same order
+      /*************************************************************************************************
+       * Give me an array and I will shuffle it. I will NOT return anything. I modify the original
+       * **********************************************************************************************/
       function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -72,12 +104,18 @@
         }
       }
 
+      /*************************************************************************************************
+       * Navigate to the view page
+       * **********************************************************************************************/
       function navigateToView() {
         const { gameId, creatorToken } = getGameToken();
         window.location.href = "/view/" + gameId;
       }
 
-      // creates a new game
+      /*************************************************************************************************
+       * This means that the user has answered all the questions and is ready to submit the game. If
+       * there are any emtpy fields the user will be alerted.
+       * **********************************************************************************************/
       async function createGame() {
         // Generates a random token for the game
         function generateToken() {
@@ -161,15 +199,22 @@
         }
       }
 
-      // responsible for rendering the intial car state and keeping state of the current question and the next selection
+      /*************************************************************************************************
+       * I am responsible for three things:
+       * 1. Rendering the cards on the initial load
+       * 2. Rendering the next cards when the user selects one option
+       * 3. Updating the game token with the current game state
+       * **********************************************************************************************/
       function renderCards() {
+        // get the game token from the local storage, so the state is preserved
         const gameToken = getGameToken();
         const categorieKeys = Object.keys(gameToken.questions);
 
+        // also get the current index of the game so we know which question to show
         let currentIndex = gameToken.currentIndex;
 
+        // I need to append to this container the current question and the options
         const container = document.getElementById("game-container");
-        const containerDone = document.getElementById("game-container-done");
 
         function showNextQuestion() {
           if (currentIndex >= categorieKeys.length) {
@@ -177,8 +222,10 @@
             return;
           }
 
+          // based on the current index, get the current category key
           const categoryKey = categorieKeys[currentIndex];
 
+          // based on the current category key, get the question and the random options
           const { question, options } = categories[categoryKey];
           const selectedOptions = getRandomOptions(options);
 
@@ -197,10 +244,15 @@
             container.appendChild(card);
           });
         }
+
+        // call the function on initial load
         showNextQuestion();
       }
 
-      // the user has answered all the questions and is ready to submit the game
+      /*************************************************************************************************
+       * This function is responsible for submitting the game. It will send the answers to the server
+       * and if successful, it will alert the user and redirect them to the view page
+       * **********************************************************************************************/
       async function submitGame() {
         const res = await fetch("/submit-game-session", {
           method: "POST",
@@ -226,7 +278,9 @@
         }
       }
 
-      // this chooses what view to render based on the view passed
+      /*************************************************************************************************
+       * It will hide and show the right elements based on the view that is passed in
+       * **********************************************************************************************/
       function renderView(view) {
         switch (view) {
           case "create":
@@ -253,28 +307,12 @@
         }
       }
 
+      /*************************************************************************************************
+       * Give me a token and I will update the local storage with the token. I already know the key
+       * **********************************************************************************************/
       function updateGameToken(token) {
         localStorage.setItem("wattamellon_token", JSON.stringify(token));
       }
-      // Three screens are possible, the create a new game screen OR the create a new session screen OR the game is done
-      document.addEventListener("DOMContentLoaded", () => {
-        const gameToken = getGameToken();
-        if (gameToken.game_id) {
-          if (gameToken.is_complete) {
-            renderView("done");
-            return;
-          }
-
-          if (gameToken.is_submitted) {
-            renderView("submitted");
-            return;
-          }
-          renderView("game");
-          renderCards();
-        } else {
-          renderView("create");
-        }
-      });
     </script>
   </body>
 </html>
