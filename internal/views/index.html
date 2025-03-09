@@ -68,7 +68,6 @@
             return;
           }
           renderView("game");
-          renderCards();
         } else {
           renderView("create");
         }
@@ -187,13 +186,10 @@
               creator_token: data.creator_token,
               questions: emtpyQuestions,
               game_id: data.id,
-              currentIndex: 0,
+              current_index: 0,
             });
           }
-
-          // hide and show the right element after the game is created successfully
-          document.getElementById("create-form").style.display = "none";
-          document.getElementById("game-container").style.display = "block";
+          renderView("game");
         } else {
           alert("Error creating game: " + data.error);
         }
@@ -211,7 +207,7 @@
         const categorieKeys = Object.keys(gameToken.questions);
 
         // also get the current index of the game so we know which question to show
-        let currentIndex = gameToken.currentIndex;
+        let currentIndex = gameToken.current_index;
 
         // I need to append to this container the current question and the options
         const container = document.getElementById("game-container");
@@ -235,8 +231,9 @@
             card.className = "card";
             card.textContent = option.value;
             card.onclick = () => {
+              currentIndex++;
               gameToken.questions[categoryKey] = option.id;
-              gameToken.currentIndex = currentIndex++;
+              gameToken.current_index = currentIndex;
               gameToken.is_complete = currentIndex >= categorieKeys.length;
               updateGameToken(gameToken);
               showNextQuestion();
@@ -294,6 +291,7 @@
             document.getElementById("game-container").style.display = "block";
             document.getElementById("game-container-done").style.display =
               "none";
+            renderCards();
             break;
           case "done":
             document.getElementById("create-form").style.display = "none";
