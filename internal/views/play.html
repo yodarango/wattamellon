@@ -21,7 +21,7 @@
     <script src="/public/categories_db.js"></script>
   </head>
   <body>
-    <!-- This is the form to create a new game -->
+    <!-- The user is startign an existing game  -->
     <div id="start-game-session">
       <h1>Start Playing {{.Game.Name}} by {{.Game.PlayerName}}</h1>
       <input type="text" id="player_name" placeholder="Your Name" />
@@ -30,25 +30,27 @@
       <button onclick="createGame()">Start Game</button>
     </div>
 
-    <!-- this is the game session -->
+    <!-- The user has already started the game but has not finished it yet -->
     <div id="game-container"></div>
 
-    <!-- this is the finished game session -->
-    <div id="game-container-done">
-      <h2>Game Complete!</h2>
-      <button onclick="submitGame()">Submit Answers</button>
+    <!-- The has been finished but not sumitted  -->
+    <div id="game-container-submitted">
+      <h2>You have completed this game. You may send you anwers now!</h2>
+      <button onclick="submitGame()">Submit</button>
     </div>
 
-    <!-- The game has been submitted. There is nothing else to see here  -->
-    <div id="game-container-submitted">
-      <h2>Game Submitted!</h2>
-      <button onclick="navigateToView()">See who has answered id</button>
+    <!-- The user has finished and sumbimitted the game. They will see the stats here-->
+    <div id="game-container-done">
+      <h2>You have completed {name} by {playr name}.</h2>
+      <p>here is how you did</p>
+      <!-- scores -->
     </div>
+
     <script>
       /*************************************************************************************************
        * Four screens are possible:
-       * 1. Create a game (default)
-       * 2. Play the game (the user ahs submitted the game information)
+       * 1. Create a game player (default)
+       * 2. Play the game (the user ahs submitted the game player information)
        * 3. Game is done (the user has answered all the questions but not submitted)
        * 4. Game is submitted (the user has submitted the game)
        * *****************************************************************************/
@@ -102,14 +104,6 @@
       }
 
       /*************************************************************************************************
-       * Navigate to the view page
-       * **********************************************************************************************/
-      function navigateToView() {
-        const { game_id, creatorToken } = getGameToken();
-        window.location.href = "/view/" + game_id;
-      }
-
-      /*************************************************************************************************
        * This means that the user has answered all the questions and is ready to submit the game. If
        * there are any emtpy fields the user will be alerted.
        * **********************************************************************************************/
@@ -149,16 +143,17 @@
 
         if (success) {
           // update the game token with the order of the questions
-          //     if (!(Object.keys(gameToken.questions || {}) > 0)) {
-          //       updateGameToken({
-          //         player_token: data.creator_token,
-          //         creator_token: data.player_token,
-          //         game_id: data.game_id,
-          //         session_id: data.id,
-          //         current_index: 0,
-          //         anwers: data.answers,
-          //       });
-          //     }
+          if (!(Object.keys(playerToken.questions || {}) > 0)) {
+            updateGameToken({
+              player_token: data.player_token,
+              game_id: data.game_id,
+              anwers: data.answers,
+              session_id: data.id,
+              is_complete: false,
+              current_index: 0,
+              success_rate: 0,
+            });
+          }
           renderView("game");
         } else {
           alert("Error creating game: " + data.error);
@@ -174,7 +169,7 @@
       function renderCards() {
         // get the game token from the local storage, so the state is preserved
         const gameToken = getGameToken();
-        const categorieKeys = Object.keys(gameToken.questions);
+        const categorieKeys = Object.keys(gameToken.answers);
 
         // also get the current index of the game so we know which question to show
         let currentIndex = gameToken.current_index;
