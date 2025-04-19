@@ -23,5 +23,6 @@ CREATE TABLE game_sessions (
   answers TEXT,
   is_completed BOOLEAN DEFAULT FALSE,
   success_rate TINYINT DEFAULT 101,
+  player_name VARCHAR(50),
   created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

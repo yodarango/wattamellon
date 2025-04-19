@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -54,6 +55,7 @@ type GameSession struct {
 	Answers     string    `json:"answers"`    
 	IsCompleted bool      `json:"is_completed"`
 	SuccessRate int       `json:"success_rate"`
+	PlayerName   string    `json:"player_name"`
 	Created     string    `json:"created"`
 }
 
@@ -222,12 +224,12 @@ func NewGameSession(w http.ResponseWriter, r *http.Request) {
 
 	query := `
 		INSERT INTO game_sessions (
-			game_id, player_token, answers
+			game_id, player_token, answers, player_name
 		)
-		VALUES(?,?,?);
+		VALUES(?,?,?,?);
 	`
 
-	result, err := RouterConfig.DB.Conn.Exec(query, gameSession.GameID, gameSession.PlayerToken, gameSession.Answers)
+	result, err := RouterConfig.DB.Conn.Exec(query, gameSession.GameID, gameSession.PlayerToken, gameSession.Answers, gameSession.PlayerName)
 
 	if err != nil {
 		response.Error = fmt.Sprintf("error creating game %v", err)
@@ -325,15 +327,16 @@ func GetHomePage(w http.ResponseWriter, r *http.Request){
 func GetGameSession(w http.ResponseWriter, r *http.Request) {
 	var response HttpResponse
 	var gameSession GameSession
+	var game Game
 
 	path := strings.Split(r.URL.Path, "/")
-	sessionId := path[len(path) - 1]
+	gameId := path[len(path) - 1]
 
-	w.Header().Set("Content-Type", "application/json")
+	// w.Header().Set("Content-Type", "application/json")
 
 	query := `SELECT id, game_id, player_token, answers, is_completed, success_rate, created FROM game_sessions WHERE id = ?;`
 
-	row := RouterConfig.DB.Conn.QueryRow(query, sessionId)
+	row := RouterConfig.DB.Conn.QueryRow(query, gameId)
 
 	err := row.Scan(
 		&gameSession.ID, 
@@ -344,7 +347,7 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 		&gameSession.SuccessRate, 
 		&gameSession.Created)
 
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		response.Error = fmt.Sprintf("error getting game %v", err)
 		response.Success = false
 		response.Data = nil
@@ -354,8 +357,27 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 
+	row = RouterConfig.DB.Conn.QueryRow(`SELECT id, name, player_name, thumbnail, creator_token, questions FROM games WHERE id = ?;`, gameId)
+
+	err = row.Scan(
+		&game.ID,
+		&game.Name,
+		&game.PlayerName,
+		&game.Thumbnail,
+		&game.CreatorToken,
+		&game.Questions,
+	)
+
+	if err != nil {
+		fmt.Println("Could not get game", err)
+		response.Error = fmt.Sprintf("error getting game %v", err)
+		response.Success = false
+		response.Data = nil
+		return
+	}
+
 	response.Success = true
-	response.Data = gameSession
+	response.Data = map[string]interface{}{"Session": gameSession, "Game": game}
 	response.Error = ""
 
 	// uncoment if i decide to make it an API
@@ -367,7 +389,7 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Unable to parse file")
 	}
 
-	err = temp.Execute(w, nil)
+	err = temp.Execute(w, response.Data)
 	
 	if err != nil {
 		fmt.Println("Unable to execute file")

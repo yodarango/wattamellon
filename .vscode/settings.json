@@ -1,7 +1,7 @@
 {
   "workbench.colorTheme": "Lightheaded",
   //turn off copilot for go
-  // "github.copilot.editor.enableAutoCompletions": false,
+  //   "github.copilot.editor.enableAutoCompletions": false,
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#fb9c9f",
     "activityBar.background": "#fb9c9f",

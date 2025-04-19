@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -31,6 +32,7 @@ func main(){
 	}
 
 	env := os.Getenv("ENV")
+	port := os.Getenv("PORT")
 
 	appConfig := config.NewAppConfig(env)
 
@@ -42,7 +44,7 @@ func main(){
 	api.SetNewRotuerConfig(appRepo)
 
 	server := http.Server{
-		Addr: ":8008",
+		Addr: fmt.Sprintf(":%s", port),
 		MaxHeaderBytes: 3 << 20, // 3MB
 		Handler: api.Router(),
 	}

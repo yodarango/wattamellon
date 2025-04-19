@@ -1,79 +1,323 @@
+<script>
+  /*************************************************************************************************
+   * This view is basically the same as the index view. The only difference is that the user is
+   * playing the game. The user will be able to select the answers to the questions and submit
+   * the game. The user will also be able to see the results of the game.
+   * *****************************************************************************/
+</script>
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Play Game</title>
+    <title>Create a Game</title>
+    <style>
+      #game-container,
+      #game-container-done,
+      #game-container-submitted {
+        display: none;
+      }
+    </style>
+    <script src="/public/categories_db.js"></script>
+  </head>
+  <body>
+    <!-- This is the form to create a new game -->
+    <div id="start-game-session">
+      <h1>Start Playing {{.Game.Name}} by {{.Game.PlayerName}}</h1>
+      <input type="text" id="player_name" placeholder="Your Name" />
+      <!-- Not allowing users to pick size for now -->
+      <input type="hidden" id="gameId" value="{{.Game.ID}}" />
+      <button onclick="createGame()">Start Game</button>
+    </div>
+
+    <!-- this is the game session -->
+    <div id="game-container"></div>
+
+    <!-- this is the finished game session -->
+    <div id="game-container-done">
+      <h2>Game Complete!</h2>
+      <button onclick="submitGame()">Submit Answers</button>
+    </div>
+
+    <!-- The game has been submitted. There is nothing else to see here  -->
+    <div id="game-container-submitted">
+      <h2>Game Submitted!</h2>
+      <button onclick="navigateToView()">See who has answered id</button>
+    </div>
     <script>
-      const gameId = window.location.pathname.split("/").pop();
-      let questions = [];
-      let answers = {};
-      let index = 0;
-      let playerToken = Math.random().toString(36).substring(2, 27);
+      /*************************************************************************************************
+       * Four screens are possible:
+       * 1. Create a game (default)
+       * 2. Play the game (the user ahs submitted the game information)
+       * 3. Game is done (the user has answered all the questions but not submitted)
+       * 4. Game is submitted (the user has submitted the game)
+       * *****************************************************************************/
+      document.addEventListener("DOMContentLoaded", () => {
+        const gameToken = getGameToken();
+        if (gameToken.game_id) {
+          if (gameToken.is_submitted) {
+            renderView("submitted");
+            return;
+          }
 
-      async function startGame() {
-        const res = await fetch("/public/categories.json");
-        const data = await res.json();
-        questions = Object.keys(data)
-          .flatMap((cat) =>
-            Object.entries(data[cat].options).map(([uid, opt]) => ({
-              question: data[cat].question,
-              option1: opt,
-              option2: "",
-            }))
-          )
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 50);
-        showQuestion();
+          if (gameToken.is_complete) {
+            renderView("done");
+            return;
+          }
+
+          renderView("game");
+        } else {
+          renderView("create");
+        }
+      });
+
+      /*************************************************************************************************
+       * Get and return the game token from the local storage
+       * **********************************************************************************************/
+      function getGameToken() {
+        let gameToken = localStorage.getItem("wattamellon_token_player");
+        gameToken = JSON.parse(gameToken || "{}");
+        return gameToken;
       }
 
-      function showQuestion() {
-        if (index >= questions.length) return submitGame();
-        const q = questions[index];
-        document.getElementById("question").innerText = q.question;
-        document.getElementById("option1").innerText = q.option1;
-        document.getElementById("option2").innerText = q.option2;
+      /*************************************************************************************************
+       * Give me an array and I will return a random selection of 2 options
+       * **********************************************************************************************/
+      function getRandomOptions(options) {
+        const keys = Object.keys(options);
+        shuffleArray(keys);
+        return keys
+          .slice(0, 2)
+          .map((key) => ({ id: key, value: options[key] }));
       }
 
-      function selectOption(opt) {
-        answers[index] = opt;
-        index++;
-        showQuestion();
+      /*************************************************************************************************
+       * Give me an array and I will shuffle it. I will NOT return anything. I modify the original
+       * **********************************************************************************************/
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
       }
 
-      async function submitGame() {
-        const correct = Object.values(answers).filter(
-          (a) => a === "correct"
-        ).length;
-        const successRate = Math.round((correct / questions.length) * 100);
+      /*************************************************************************************************
+       * Navigate to the view page
+       * **********************************************************************************************/
+      function navigateToView() {
+        const { game_id, creatorToken } = getGameToken();
+        window.location.href = "/view/" + game_id;
+      }
 
-        const res = await fetch("/submit-game-session", {
+      /*************************************************************************************************
+       * This means that the user has answered all the questions and is ready to submit the game. If
+       * there are any emtpy fields the user will be alerted.
+       * **********************************************************************************************/
+      async function createGame() {
+        // Generates a random token for the game
+        function generateToken() {
+          let token = "";
+          const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+          for (let i = 0; i < 25; i++) {
+            token += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return token;
+        }
+
+        const playerName = document.getElementById("player_name").value;
+        const gameId = document.getElementById("gameId").value;
+        const playerToken = generateToken();
+
+        // alert the user if they have not selected a thumbnail or have not entered a name
+        if (!playerName) {
+          alert("Please enter your name");
+          return;
+        }
+
+        const res = await fetch("/new-game-session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            game_id: gameId,
             player_token: playerToken,
-            answers: JSON.stringify(answers),
-            success_rate: successRate,
+            player_name: playerName,
+            game_id: Number(gameId),
+            answers: JSON.stringify({}),
+          }),
+        });
+
+        const { data, success } = await res.json();
+
+        if (success) {
+          // update the game token with the order of the questions
+          //     if (!(Object.keys(gameToken.questions || {}) > 0)) {
+          //       updateGameToken({
+          //         player_token: data.creator_token,
+          //         creator_token: data.player_token,
+          //         game_id: data.game_id,
+          //         session_id: data.id,
+          //         current_index: 0,
+          //         anwers: data.answers,
+          //       });
+          //     }
+          renderView("game");
+        } else {
+          alert("Error creating game: " + data.error);
+        }
+      }
+
+      /*************************************************************************************************
+       * I am responsible for three things:
+       * 1. Rendering the cards on the initial load
+       * 2. Rendering the next cards when the user selects one option
+       * 3. Updating the game token with the current game state
+       * **********************************************************************************************/
+      function renderCards() {
+        // get the game token from the local storage, so the state is preserved
+        const gameToken = getGameToken();
+        const categorieKeys = Object.keys(gameToken.questions);
+
+        // also get the current index of the game so we know which question to show
+        let currentIndex = gameToken.current_index;
+
+        // I need to append to this container the current question and the options
+        const container = document.getElementById("game-container");
+
+        function showNextQuestion() {
+          if (currentIndex >= categorieKeys.length) {
+            renderView("done");
+            return;
+          }
+
+          // based on the current index, get the current category key
+          const categoryKey = categorieKeys[currentIndex];
+
+          // based on the current category key, get the question and the random options
+          const { question, options } = categories[categoryKey];
+          const selectedOptions = getRandomOptions(options);
+
+          container.innerHTML = "";
+          const h4 = document.createElement("h4");
+          h4.textContent = `Question ${currentIndex + 1} of ${
+            categorieKeys.length
+          }`;
+          container.appendChild(h4);
+
+          const h3 = document.createElement("h3");
+          h3.textContent = question;
+          container.appendChild(h3);
+
+          selectedOptions.forEach((option) => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.textContent = option.value;
+            card.onclick = () => {
+              currentIndex++;
+              gameToken.questions[categoryKey] = option.id;
+              gameToken.current_index = currentIndex;
+              gameToken.is_complete = currentIndex >= categorieKeys.length;
+              updateGameToken(gameToken);
+              showNextQuestion();
+            };
+            container.appendChild(card);
+          });
+        }
+
+        // call the function on initial load
+        showNextQuestion();
+      }
+
+      /*************************************************************************************************
+       * This function is responsible for submitting the game. It will send the answers to the server
+       * and if successful, it will alert the user and redirect them to the view page
+       * **********************************************************************************************/
+      async function submitGame() {
+        // check that the user has answered all the questions
+
+        const gameToken = getGameToken();
+        const { creator_token, game_id, questions, is_complete } = gameToken;
+
+        if (!is_complete) {
+          alert("Please answer all the questions before submitting");
+          return;
+        }
+        const res = await fetch("/complete-game", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: game_id,
+            creator_token,
+            questions: JSON.stringify(questions),
             is_completed: true,
           }),
         });
 
         const data = await res.json();
         if (data.success) {
-          alert("Game completed! Your score: " + successRate + "%");
-          window.location.href = "/view/" + gameId;
+          gameToken.is_submitted = true;
+          updateGameToken(gameToken);
+
+          alert("Game submitted! You can now view the results.");
+          renderView("submitted");
+          //     window.location.href = "/view/" + game_id;
         } else {
-          alert("Error submitting game session.");
+          alert("Error submitting game.");
         }
       }
+
+      /*************************************************************************************************
+       * It will hide and show the right elements based on the view that is passed in
+       * **********************************************************************************************/
+      function renderView(view) {
+        switch (view) {
+          case "create":
+            document.getElementById("start-game-session").style.display =
+              "block";
+            document.getElementById("game-container").style.display = "none";
+            document.getElementById("game-container-done").style.display =
+              "none";
+            document.getElementById("game-container-submitted").style.display =
+              "none";
+            break;
+          case "game":
+            document.getElementById("start-game-session").style.display =
+              "none";
+            document.getElementById("game-container").style.display = "block";
+            document.getElementById("game-container-done").style.display =
+              "none";
+            document.getElementById("game-container-submitted").style.display =
+              "none";
+            renderCards();
+            break;
+          case "done":
+            document.getElementById("start-game-session").style.display =
+              "none";
+            document.getElementById("game-container").style.display = "none";
+            document.getElementById("game-container-done").style.display =
+              "block";
+            document.getElementById("game-container-submitted").style.display =
+              "none";
+            break;
+
+          case "submitted":
+            document.getElementById("start-game-session").style.display =
+              "none";
+            document.getElementById("game-container").style.display = "none";
+            document.getElementById("game-container-done").style.display =
+              "none";
+            document.getElementById("game-container-submitted").style.display =
+              "block";
+
+          default:
+            break;
+        }
+      }
+
+      /*************************************************************************************************
+       * Give me a token and I will update the local storage with the token. I already know the key
+       * **********************************************************************************************/
+      function updateGameToken(token) {
+        localStorage.setItem("wattamellon_token_player", JSON.stringify(token));
+      }
     </script>
-  </head>
-  <body>
-    <h1>Play Game</h1>
-    <h2 id="question">Click "Start" to begin</h2>
-    <button id="option1" onclick="selectOption('left')"></button>
-    <button id="option2" onclick="selectOption('right')"></button>
-    <button onclick="startGame()">Start Game</button>
   </body>
 </html>

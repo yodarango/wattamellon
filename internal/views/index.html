@@ -56,7 +56,7 @@
        * 4. Game is submitted (the user has submitted the game)
        * *****************************************************************************/
       document.addEventListener("DOMContentLoaded", () => {
-        const gameToken = getGameToken();
+        const gameToken = getGameTokenFromLocalStorage();
         if (gameToken.game_id) {
           if (gameToken.is_submitted) {
             renderView("submitted");
@@ -77,7 +77,7 @@
       /*************************************************************************************************
        * Get and return the game token from the local storage
        * **********************************************************************************************/
-      function getGameToken() {
+      function getGameTokenFromLocalStorage() {
         let gameToken = localStorage.getItem("wattamellon_token");
         gameToken = JSON.parse(gameToken || "{}");
         return gameToken;
@@ -108,7 +108,7 @@
        * Navigate to the view page
        * **********************************************************************************************/
       function navigateToView() {
-        const { game_id, creatorToken } = getGameToken();
+        const { game_id, creatorToken } = getGameTokenFromLocalStorage();
         window.location.href = "/view/" + game_id;
       }
 
@@ -129,12 +129,12 @@
 
         // gets the current values set in the form to createa a game
         function getFormValues() {
-          const thumbnail =
-            document.querySelector('input[name="thumbnail"]:checked')?.value ||
-            "default.png";
+          const thumbnail = document.querySelector(
+            'input[name="thumbnail"]:checked'
+          )?.value;
           const name = document.getElementById("name").value;
           const playerName = document.getElementById("player_name").value;
-          const size = document.getElementById("size").value;
+          const size = 10; //DEV UNCOMMENT document.getElementById("size").value;
 
           return { thumbnail, playerName, size, name };
         }
@@ -156,8 +156,9 @@
           return;
         }
 
-        const gameToken = getGameToken();
-        const categorieKeys = Object.keys(categories);
+        const gameToken = getGameTokenFromLocalStorage();
+        const categorieKeys = Object.keys(categories).splice(0, size);
+        // shuffle the categories so that the questions are not in the same order
         shuffleArray(categorieKeys);
 
         const emtpyQuestions = categorieKeys.reduce((acc, key) => {
@@ -186,8 +187,14 @@
             updateGameToken({
               creator_token: data.creator_token,
               questions: emtpyQuestions,
+              thumbnail: data.thumbnail,
+              created: data.created,
+              is_complete: false,
+              is_submitted: false,
               game_id: data.id,
               current_index: 0,
+              size: data.size,
+              name: data.name,
             });
           }
           renderView("game");
@@ -204,7 +211,7 @@
        * **********************************************************************************************/
       function renderCards() {
         // get the game token from the local storage, so the state is preserved
-        const gameToken = getGameToken();
+        const gameToken = getGameTokenFromLocalStorage();
         const categorieKeys = Object.keys(gameToken.questions);
 
         // also get the current index of the game so we know which question to show
@@ -264,7 +271,7 @@
       async function submitGame() {
         // check that the user has answered all the questions
 
-        const gameToken = getGameToken();
+        const gameToken = getGameTokenFromLocalStorage();
         const { creator_token, game_id, questions, is_complete } = gameToken;
 
         if (!is_complete) {
