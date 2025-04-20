@@ -34,16 +34,16 @@
     <div id="game-container"></div>
 
     <!-- The has been finished but not sumitted  -->
-    <div id="game-container-submitted">
+    <div id="game-container-done">
       <h2>You have completed this game. You may send you anwers now!</h2>
       <button onclick="submitGame()">Submit</button>
     </div>
 
     <!-- The user has finished and sumbimitted the game. They will see the stats here-->
-    <div id="game-container-done">
+    <div id="game-container-submitted">
       <h2>You have completed {name} by {playr name}.</h2>
       <p>here is how you did</p>
-      <!-- scores -->
+      <div id="game-results"></div>
     </div>
 
     <script>
@@ -58,6 +58,8 @@
         const gameToken = getGameToken();
         if (gameToken.game_id) {
           if (gameToken.is_submitted) {
+            updateFinalResults();
+
             renderView("submitted");
             return;
           }
@@ -104,8 +106,7 @@
       }
 
       /*************************************************************************************************
-       * This means that the user has answered all the questions and is ready to submit the game. If
-       * there are any emtpy fields the user will be alerted.
+       * The new game session is created here. The user will be able to select the answers to the
        * **********************************************************************************************/
       async function createGame() {
         // Generates a random token for the game
@@ -135,11 +136,21 @@
             player_token: playerToken,
             player_name: playerName,
             game_id: Number(gameId),
-            answers: JSON.stringify({}),
+            answers: "{}",
           }),
         });
 
         const { data, success } = await res.json();
+
+        // get the questions from the game and set up an empty answer for each one to start with
+        const gameQuestions = `{{.Game.Questions}}`;
+        const gameQuestionsParsed = JSON.parse(gameQuestions);
+        const gameQuestionsKeys = Object.keys(gameQuestionsParsed);
+
+        const emtpyAnswers = gameQuestionsKeys.reduce((acc, key) => {
+          acc[key] = "";
+          return acc;
+        }, {});
 
         if (success) {
           // update the game token with the order of the questions
@@ -147,11 +158,11 @@
             updateGameToken({
               player_token: data.player_token,
               game_id: data.game_id,
-              anwers: data.answers,
-              session_id: data.id,
+              answers: emtpyAnswers,
               is_complete: false,
               current_index: 0,
               success_rate: 0,
+              id: data.id,
             });
           }
           renderView("game");
@@ -186,9 +197,12 @@
           // based on the current index, get the current category key
           const categoryKey = categorieKeys[currentIndex];
 
-          // based on the current category key, get the question and the random options
+          // based on the current category key, get the question
           const { question, options } = categories[categoryKey];
-          const selectedOptions = getRandomOptions(options);
+          // and also the options
+          const gameQuestions = `{{.Game.Questions}}`;
+          const selectedOptionsParsed = JSON.parse(gameQuestions);
+          const selectedOptions = selectedOptionsParsed[categoryKey].options;
 
           container.innerHTML = "";
           const h4 = document.createElement("h4");
@@ -201,13 +215,18 @@
           h3.textContent = question;
           container.appendChild(h3);
 
+          // when the user selects an option, also let them know if they are correct or not
           selectedOptions.forEach((option) => {
             const card = document.createElement("div");
             card.className = "card";
             card.textContent = option.value;
             card.onclick = () => {
               currentIndex++;
-              gameToken.questions[categoryKey] = option.id;
+              gameToken.answers[categoryKey] = {
+                selection: option.id,
+                isCorrect:
+                  option.id === selectedOptionsParsed[categoryKey].selection,
+              };
               gameToken.current_index = currentIndex;
               gameToken.is_complete = currentIndex >= categorieKeys.length;
               updateGameToken(gameToken);
@@ -223,40 +242,106 @@
 
       /*************************************************************************************************
        * This function is responsible for submitting the game. It will send the answers to the server
-       * and if successful, it will alert the user and redirect them to the view page
+       * and if successful, it will alert the user and display the results
        * **********************************************************************************************/
       async function submitGame() {
         // check that the user has answered all the questions
 
         const gameToken = getGameToken();
-        const { creator_token, game_id, questions, is_complete } = gameToken;
+        const { player_token, id, answers } = gameToken;
 
-        if (!is_complete) {
+        // now, based on the answer values and the game questions, check the total number of questions
+        // answered correctly and incorrectly.
+        const gameQuestions = JSON.parse(`{{.Game.Questions}}`);
+        let incorrectAnswers = Object.keys(answers).filter(
+          (key) => answers[key].isCorrect === false
+        ).length;
+        let correctAnswers = Object.keys(answers).filter(
+          (key) => answers[key].isCorrect === true
+        ).length;
+
+        // check if the user has answered all the questions
+        let isComplete = true;
+        Object.keys(gameQuestions).forEach((key) => {
+          if (!answers[key]) {
+            isComplete = false;
+          }
+        });
+
+        const successRate =
+          (correctAnswers / Object.keys(gameQuestions).length) * 100;
+
+        if (!isComplete) {
           alert("Please answer all the questions before submitting");
           return;
         }
-        const res = await fetch("/complete-game", {
+
+        const res = await fetch("/submit-game-session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            id: game_id,
-            creator_token,
-            questions: JSON.stringify(questions),
-            is_completed: true,
+            answers: JSON.stringify(answers),
+            success_rate: successRate,
+            player_token,
+            id,
           }),
         });
 
         const data = await res.json();
         if (data.success) {
+          gameToken.incorrect_answers = incorrectAnswers;
+          gameToken.correct_answers = correctAnswers;
+          gameToken.success_rate = successRate;
           gameToken.is_submitted = true;
           updateGameToken(gameToken);
 
+          updateFinalResults();
+
           alert("Game submitted! You can now view the results.");
           renderView("submitted");
-          //     window.location.href = "/view/" + game_id;
         } else {
           alert("Error submitting game.");
         }
+      }
+
+      /*************************************************************************************************
+       * Update the results of the game. Show the total percentage as well as the correct and incorrect
+       * answers.
+       * **********************************************************************************************/
+      function updateFinalResults() {
+        const gameToken = getGameToken();
+        const { answers, success_rate, correct_answers, incorrect_answers } =
+          gameToken;
+
+        const resultsContainer = document.getElementById("game-results");
+
+        // game questions
+        const gameQuestions = `{{.Game.Questions}}`;
+        const gameQuestionsParsed = JSON.parse(gameQuestions);
+
+        resultsContainer.innerHTML = `
+          <h3>Success Rate: ${success_rate}%</h3>
+          <h4>Correct Answers: ${correct_answers}</h4>
+          <h4>Incorrect Answers: ${incorrect_answers}</h4>
+          <h3>Answer breakdown:</h4>
+          ${Object.keys(answers)
+            .map((key) => {
+              const question = categories[key].question;
+              const selectedOption =
+                categories[key]["options"][answers[key].selection];
+              const creatorSelectOption =
+                categories[key]["options"][gameQuestionsParsed[key].selection];
+              const isCorrect = answers[key].isCorrect;
+              return `
+              <div class="${isCorrect ? "correct" : "incorrect"}">
+                <h4>${question}</h4>
+                <p>Selected Option: ${selectedOption}</p>
+                <p>Is Correct: ${creatorSelectOption}</p>
+              </div>
+            `;
+            })
+            .join("")}
+        `;
       }
 
       /*************************************************************************************************

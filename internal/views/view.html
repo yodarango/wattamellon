@@ -4,6 +4,56 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game View</title>
+    <script src="/public/categories_db.js"></script>
+    <script>
+      // set the answers of this user
+      const yourAnswers = {{.Game.Questions}};
+    </script>
+  </head>
+  <body>
+    <h1>Game sessions for {{.Game.Name}}</h1>
+    <img src="{{.Game.Thumbnail}}" alt="{{.Game.Name}}" />
+    <p>Share this link with your friends:</p>
+    <input type="text" value="" id="gameLink" readonly />
+    <button onclick="copyLink()">Copy Link</button>
+
+    <!-- dummy div for varaible data storage since it is much easier to parse with JS -->
+
+    <div id="sessions">
+      {{if .Sessions}}
+      <h2>Players</h2>
+      {{range .Sessions}}
+      <h4>Player: {{.PlayerName}}</h4>
+      <h5>Score: {{.SuccessRate}}%</h5>
+      <div id="player-results-{{.ID}}">
+        <div class="results-display"></div>
+      </div>
+      <script>
+        Object.keys(yourAnswers).forEach((key) => {
+          const question = categories[key]["question"];
+          const yourSelection =
+            categories[key]["options"][yourAnswers[key].selection];
+        const playerAnswer = categories[key]["options"][{{.Answers}}[key]?.selection];
+
+        const resultsDisplay = document.querySelector(
+          `#player-results-{{.ID}} .results-display`
+        );
+
+        resultsDisplay.innerHTML += `
+          <div class="question ${ {{.Answers}}[key]?.isCorrect ? "answer-correct" : "answer-incorrect" }">
+            <b>${question}</b>
+            <p>Your answer: ${yourSelection || "None"}</p>
+            <p>Player's answer: ${playerAnswer || "None"}</p>
+          </div>
+        `;
+        });
+      </script>
+      {{end}} {{else}}
+      <p>No players have played this game yet.</p>
+      {{end}}
+    </div>
+    <button onclick="deleteGame()">Delete Game</button>
+
     <script>
       const gameId = window.location.pathname.split("/").pop();
 
@@ -19,23 +69,5 @@
         window.location.href = "/";
       }
     </script>
-  </head>
-  <body>
-    <h1>Game sessions for {{.Game.Name}}</h1>
-    <img src="{{.Game.Thumbnail}}" alt="{{.Game.Name}}" />
-    <p>Share this link with your friends:</p>
-    <input type="text" value="" id="gameLink" readonly />
-    <button onclick="copyLink()">Copy Link</button>
-
-    <div id="sessions">
-      {{if .GameSessions}}
-      <h2>Players</h2>
-      {{range .GameSessions}}
-      <div>Player: {{.PlayerToken}} | Score: {{.SuccessRate}}%</div>
-      {{end}} {{else}}
-      <p>No players have played this game yet.</p>
-      {{end}}
-    </div>
-    <button onclick="deleteGame()">Delete Game</button>
   </body>
 </html>

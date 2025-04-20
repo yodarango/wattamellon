@@ -163,7 +163,7 @@ func CompleteGame(w http.ResponseWriter, r *http.Request){
 	}
 
 	query := `
-		UPDATE games set questions = ?, is_complete = true WHERE id = ?;
+		UPDATE game set questions = ?, is_complete = true WHERE id = ?;
 	`
 
 	result, err := RouterConfig.DB.Conn.Exec(query, game.Questions, game.ID)
@@ -310,6 +310,8 @@ func SubmitGameSession(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+// Renders index.html, the home page
+// this is the page where the user can create a new game
 func GetHomePage(w http.ResponseWriter, r *http.Request){
 	temp, err := template.ParseFiles("internal/views/index.html")
 
@@ -324,6 +326,7 @@ func GetHomePage(w http.ResponseWriter, r *http.Request){
 	}
 }
 
+// Renders play.htmt, the user is playig the game
 func GetGameSession(w http.ResponseWriter, r *http.Request) {
 	var response HttpResponse
 	var gameSession GameSession
@@ -406,7 +409,7 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 
 	// w.Header().Set("Content-Type", "application/json")
 
-	query := `SELECT id, game_id, player_token, answers, is_completed, success_rate, created FROM game_sessions WHERE game_id = ?;`
+	query := `SELECT id, game_id, player_token, player_name, answers, is_completed, success_rate, created FROM game_sessions WHERE game_id = ?;`
 
 	rows, err := RouterConfig.DB.Conn.Query(query, gameId)
 
@@ -430,7 +433,8 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 		err := rows.Scan(
 		&gameSession.ID, 
 		&gameSession.GameID, 
-		&gameSession.PlayerToken, 
+		&gameSession.PlayerToken,
+		&gameSession.PlayerName, 
 		&gameSession.Answers, 
 		&gameSession.IsCompleted, 
 		&gameSession.SuccessRate, 

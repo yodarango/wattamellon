@@ -244,13 +244,17 @@
           h3.textContent = question;
           container.appendChild(h3);
 
+          // when the user clicks on the card, we need to update the game token with the selected option but also with the two options given to them so that the player can see the same options they had
           selectedOptions.forEach((option) => {
             const card = document.createElement("div");
             card.className = "card";
             card.textContent = option.value;
             card.onclick = () => {
               currentIndex++;
-              gameToken.questions[categoryKey] = option.id;
+              gameToken.questions[categoryKey] = {
+                selection: option.id,
+                options: [...selectedOptions],
+              };
               gameToken.current_index = currentIndex;
               gameToken.is_complete = currentIndex >= categorieKeys.length;
               updateGameToken(gameToken);
