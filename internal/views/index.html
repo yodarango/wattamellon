@@ -61,8 +61,14 @@
       rel="apple-touch-icon"
       href="/public/images/web_hosted_apps/wattamellon.webp"
     />
+
+    <!-- manifest and local data -->
     <link rel="manifest" href="/public/manifest.json" />
     <link rel="manifest" href="/public/avatars.js" />
+
+    <!-- icons -->
+     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+      <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
     <link
       rel="stylesheet"
@@ -116,92 +122,143 @@
                   border: none;
                   cursor: pointer;
             }
-      }
 
-      #avatar-dialog {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            overflow-y: auto;
-      }
+            .btn-secondary{
+                  background-color: rgba(var(--dr-alpha-rgb), 0.2);
+                  color: var(--dr-alpha);
+                  display: block;
+                  padding: 1.6rem 2rem;
+                  border-radius: 2rem;
+                  border: .1rem solid rgba(var(--dr-alpha-rgb), 0.25);
+                  cursor: pointer;
+            }
 
-      .dialog-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 2rem;
-            border-radius: 1rem;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-      }
 
-      .dialog-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-      }
+            #avatar-dialog {
+                  display: none;
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  background-color: rgba(var(--dr-delta-rgb), 0.5);
+                  z-index: 1000;
+                  overflow-y: auto;
+            }
 
-      .close-button {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-      }
+            .dialog-content {
+                  background-color: var(--dr-beta);
+                  margin: 10% auto;
+                  padding: 0;
+                  border-radius: 1rem;
+                  width: 90%;
+                  max-width: 600px;
+                  max-height: 80vh;
+                  overflow-y: hidden;
+                  display: flex;
+                  flex-direction: column;
+                  position: relative;
+            }
 
-      .avatars-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-      }
+            .dialog-header {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  padding: 1rem 2rem;
+                  background-color: var(--dr-beta);
+                  border-bottom: 1px solid var(--dr-omicron);
+                  position: sticky;
+                  top: 0;
+                  z-index: 10;
+            }
 
-      .avatar-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
-      }
+            .close-button {
+                  background: none;
+                  border: none;
+                  font-size: 1.5rem;
+                  cursor: pointer;
+            }
 
-      .avatar-item:hover {
-            background-color: #f0f0f0;
-      }
+            .avatars-container {
+                  padding: 1rem 2rem;
+                  overflow-y: auto;
+                  max-height: calc(80vh - 120px);
+            }
 
-      .avatar-item img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            margin-bottom: 0.5rem;
-      }
+            .avatars-grid {
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                  gap: 1rem;
+                  margin-bottom: 1rem;
+            }
 
-      .avatar-item p {
-            font-size: 0.8rem;
-            text-align: center;
-            margin: 0;
-      }
+            .avatar-item {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  cursor: pointer;
+                  padding: 0.5rem;
+                  border-radius: 0.5rem;
+                  transition: background-color 0.2s;
+            }
 
-      .load-more {
-            display: block;
-            margin: 1rem auto;
-            padding: 0.8rem 1.5rem;
-            background-color: var(--dr-delta);
-            color: var(--dr-alpha);
-            border: none;
-            border-radius: 1rem;
-            cursor: pointer;
-      }
+            .avatar-item:hover {
+                  background-color: var(--dr-gamma);
+            }
 
-      .selected-avatar {
-            background-color: #e0e0ff;
+            .avatar-item img {
+                  width: 80px;
+                  height: 80px;
+                  object-fit: contain;
+                  margin-bottom: 0.5rem;
+            }
+
+            .avatar-item p {
+                  font-size: 0.8rem;
+                  text-align: center;
+                  margin: 0;
+            }
+
+            .load-more-container {
+                  padding: 1rem;
+                  background-color: var(--dr-beta);
+                  border-top: 1px solid var(--dr-omicron);
+                  position: sticky;
+                  bottom: 0;
+                  z-index: 10;
+            }
+
+            .load-more {
+                  display: block;
+                  margin: 0 auto;
+                  padding: 0.8rem 1.5rem;
+                  background-color: var(--dr-delta);
+                  color: var(--dr-alpha);
+                  border: none;
+                  border-radius: 1rem;
+                  cursor: pointer;
+                  width: 100%;
+                  max-width: 200px;
+            }
+
+            .selected-avatar {
+                  background-color: var(--dr-gamma);
+            }
+
+            #selected_avatar_display {
+                  display: none;
+                  background-color: rgba(var(--dr-delta-rgb), 0.4);
+                  padding: var(--dr-spacing-4);
+                  border: .1rem solid var(--dr-delta);
+                  border-radius: 2rem;
+
+                  img {
+                        width: 100%;
+                        max-width: 10rem;
+                        object-fit: contain;
+                        object-position: center;
+                  }
+            }
       }
     </style>
 
@@ -220,25 +277,29 @@
         <input type="text" id="player_name" placeholder="Your Name" />
         <!-- Not allowing users to pick size for now -->
         <input type="hidden" id="size" value="50" />
-        <h3>Select Avatar</h3>
         <input type="hidden" id="selected_avatar" name="thumbnail" value="" />
-        <div id="selected_avatar_display">
-          <p>No avatar selected</p>
+        <div id="selected_avatar_display" class="align-items-center justify-content-start gap-4 w-100">
         </div>
-        <button type="button" onclick="openAvatarDialog()" class="btn-primary">Select Avatar</button>
-        <button onclick="createGame()" class="btn-primary">Save Game</button>
+        <button type="button" onclick="openAvatarDialog()" class="btn-secondary w-100">Select Avatar</button>
+        <button onclick="createGame()" class="btn-primary w-100">Save Game</button>
 
         <!-- Avatar Selection Dialog -->
         <div id="avatar-dialog">
           <div class="dialog-content">
             <div class="dialog-header">
               <h3>Select an Avatar</h3>
-              <button class="close-button" onclick="closeAvatarDialog()">×</button>
+              <button class="close-button p-0" onclick="closeAvatarDialog()">
+                  <ion-icon name="close-outline"></ion-icon>
+              </button>
             </div>
-            <div id="avatars-container" class="avatars-grid">
-              <!-- Avatars will be loaded here -->
+            <div class="avatars-container">
+              <div id="avatars-container" class="avatars-grid">
+                <!-- Avatars will be loaded here -->
+              </div>
             </div>
-            <button id="load-more-btn" class="load-more" onclick="loadMoreAvatars()">Load More</button>
+            <div class="load-more-container">
+              <button id="load-more-btn" class="load-more" onclick="loadMoreAvatars()">Load More</button>
+            </div>
           </div>
         </div>
       </div>
@@ -249,7 +310,7 @@
       <!-- this is the finished game session -->
       <div id="game-container-done">
         <h2>Game Complete!</h2>
-        <button onclick="submitGame()">Submit Answers</button>
+        <button onclick="submitGame()" >Submit Answers</button>
       </div>
 
       <!-- The game has been submitted. There is nothing else to see here  -->
@@ -325,9 +386,11 @@
           document.getElementById('selected_avatar').value = file;
 
           // Update display
-          document.getElementById('selected_avatar_display').innerHTML = `
-            <img src="/public/images/avatars/${file}" alt="${name}" style="width: 100px; height: 100px; object-fit: contain;">
-            <p>${name}</p>
+          const display = document.getElementById('selected_avatar_display');
+          display.style.display = 'flex';
+          display.innerHTML = `
+            <img src="/public/images/avatars/${file}" alt="${name}">
+            <h2 class="m-0">${name}</h2>
           `;
 
           // Update selected class in dialog
