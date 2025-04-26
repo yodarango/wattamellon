@@ -89,6 +89,180 @@
       #game-container-submitted {
         display: none;
       }
+
+      #start-game-session {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.6rem;
+        text-align: center;
+        padding: 2rem 0;
+        margin: 2rem auto 0;
+      }
+
+      #start-game-session h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      #start-game-session input {
+        width: 100%;
+        border: 1px solid var(--dr-delta);
+        border-radius: 2rem;
+        padding: 1.6rem;
+        display: block;
+      }
+
+      #start-game-session button {
+        background-color: var(--dr-delta);
+        color: var(--dr-alpha);
+        padding: 1.6rem 2rem;
+        border-radius: 2rem;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      #game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 2rem;
+        padding: 2rem 0;
+        margin: 2rem auto 0;
+      }
+
+      #game-container h4 {
+        font-size: 1.2rem;
+        color: var(--dr-alpha);
+        opacity: 0.7;
+        margin: 0;
+      }
+
+      #game-container h3 {
+        font-size: 1.8rem;
+        margin: 0.5rem 0 1.5rem;
+        max-width: 90%;
+      }
+
+      .options-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        width: 100%;
+      }
+
+      .option-card {
+        background-color: rgba(var(--dr-alpha-rgb), 0.2);
+        color: var(--dr-alpha);
+        border: 0.1rem solid rgba(var(--dr-alpha-rgb), 0.25);
+        border-radius: 2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: var(--dr-spacing-4);
+        aspect-ratio: 1/1;
+        font-size: 1.2rem;
+        transition: all 0.2s ease;
+      }
+
+      .option-card:hover {
+        background-color: rgba(var(--dr-alpha-rgb), 0.4);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        scale: .9;
+        color: var(--dr-beta);
+        transform: translateY(-3px);
+        transition: 300ms;
+      }
+
+      #game-container-done {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.6rem;
+        text-align: center;
+        padding: 2rem 0;
+        margin: 2rem auto 0;
+      }
+
+      #game-container-done h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      #game-container-done button {
+        background-color: var(--dr-delta);
+        color: var(--dr-alpha);
+        padding: 1.6rem 2rem;
+        border-radius: 2rem;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      #game-container-submitted {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.6rem;
+        text-align: center;
+        padding: 2rem 0;
+        margin: 2rem auto 0;
+      }
+
+      #game-container-submitted h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      #game-results {
+        width: 100%;
+        margin-top: 2rem;
+      }
+
+      #game-results h3 {
+        font-size: 1.5rem;
+        margin: 1.5rem 0 1rem;
+      }
+
+      #game-results h4 {
+        font-size: 1.2rem;
+        margin: 1rem 0 0.5rem;
+      }
+
+      #game-results .correct,
+      #game-results .incorrect {
+        padding: 1.5rem;
+        border-radius: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      #game-results .correct {
+        background-color: rgba(0, 200, 0, 0.1);
+        border: 1px solid rgba(0, 200, 0, 0.3);
+      }
+
+      #game-results .incorrect {
+        background-color: rgba(255, 0, 0, 0.1);
+        border: 1px solid rgba(255, 0, 0, 0.3);
+      }
+
+      .thumbnail {
+            width: 100%;
+            max-width: 20rem;
+            margin: auto;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+      }
     </style>
 
     <script src="/public/categories_db.js"></script>
@@ -97,10 +271,11 @@
   </head>
   <body>
     <main>
-      <!-- The user is startign an existing game  -->
+      <!-- The user is starting an existing game  -->
       <div id="start-game-session">
-        <h1>Start Playing {{.Game.Name}} by {{.Game.PlayerName}}</h1>
-        <input type="text" id="player_name" placeholder="Your Name" />
+        <h1>Start Playing {{.Game.Name}}</h1>
+        <p>Created by {{.Game.PlayerName}}</p>
+        <input type="text" id="player_name" placeholder="Your Name" class="mb-4" />
         <!-- Not allowing users to pick size for now -->
         <input type="hidden" id="gameId" value="{{.Game.ID}}" />
         <button onclick="createGame()">Start Game</button>
@@ -109,16 +284,18 @@
       <!-- The user has already started the game but has not finished it yet -->
       <div id="game-container"></div>
 
-      <!-- The has been finished but not sumitted  -->
+      <!-- The has been finished but not submitted  -->
       <div id="game-container-done">
-        <h2>You have completed this game. You may send you anwers now!</h2>
-        <button onclick="submitGame()">Submit</button>
+        <h2>You have completed this game!</h2>
+        <img src="/public/images/thank_you_4000.webp" class="thumbnail" />
+        <p class="mb-4">Submit your answers to see how well you know {{.Game.PlayerName}}.</p>
+        <button onclick="submitGame()">Submit Answers</button>
       </div>
 
-      <!-- The user has finished and sumbimitted the game. They will see the stats here-->
+      <!-- The user has finished and submitted the game. They will see the stats here-->
       <div id="game-container-submitted">
-        <h2>You have completed {name} by {playr name}.</h2>
-        <p>here is how you did</p>
+        <h2>Results for {{.Game.Name}}</h2>
+        <p>Here's how well you know {{.Game.PlayerName}}:</p>
         <div id="game-results"></div>
       </div>
 
@@ -281,20 +458,28 @@
             const selectedOptions = selectedOptionsParsed[categoryKey].options;
 
             container.innerHTML = "";
+
+            // Create question counter
             const h4 = document.createElement("h4");
             h4.textContent = `Question ${currentIndex + 1} of ${
               categorieKeys.length
             }`;
             container.appendChild(h4);
 
+            // Create question text
             const h3 = document.createElement("h3");
             h3.textContent = question;
             container.appendChild(h3);
 
+            // Create options container
+            const optionsContainer = document.createElement("div");
+            optionsContainer.className = "options-container";
+            container.appendChild(optionsContainer);
+
             // when the user selects an option, also let them know if they are correct or not
             selectedOptions.forEach((option) => {
               const card = document.createElement("div");
-              card.className = "card";
+              card.className = "option-card";
               card.textContent = option.value;
               card.onclick = () => {
                 currentIndex++;
@@ -308,7 +493,7 @@
                 updateGameToken(gameToken);
                 showNextQuestion();
               };
-              container.appendChild(card);
+              optionsContainer.appendChild(card);
             });
           }
 
@@ -395,11 +580,25 @@
           const gameQuestions = `{{.Game.Questions}}`;
           const gameQuestionsParsed = JSON.parse(gameQuestions);
 
+          // Calculate score percentage for display
+          const scorePercentage = Math.round(success_rate);
+
           resultsContainer.innerHTML = `
-          <h3>Success Rate: ${success_rate}%</h3>
-          <h4>Correct Answers: ${correct_answers}</h4>
-          <h4>Incorrect Answers: ${incorrect_answers}</h4>
-          <h3>Answer breakdown:</h4>
+          <div class="score-summary">
+            <h3>Your Score: ${scorePercentage}%</h3>
+            <div class="score-details">
+              <div class="score-item">
+                <span class="score-number">${correct_answers}</span>
+                <span class="score-label">Correct</span>
+              </div>
+              <div class="score-item">
+                <span class="score-number">${incorrect_answers}</span>
+                <span class="score-label">Incorrect</span>
+              </div>
+            </div>
+          </div>
+
+          <h3>Answer Breakdown:</h3>
           ${Object.keys(answers)
             .map((key) => {
               const question = categories[key].question;
@@ -411,13 +610,49 @@
               return `
               <div class="${isCorrect ? "correct" : "incorrect"}">
                 <h4>${question}</h4>
-                <p>Selected Option: ${selectedOption}</p>
-                <p>Is Correct: ${creatorSelectOption}</p>
+                <p><strong>Your answer:</strong> ${selectedOption}</p>
+                <p><strong>${isCorrect ? "Correct!" : "Correct answer was:"}</strong> ${creatorSelectOption}</p>
               </div>
             `;
             })
             .join("")}
         `;
+
+          // Add styles for the score summary
+          const style = document.createElement('style');
+          style.textContent = `
+            .score-summary {
+              background-color: var(--dr-gamma);
+              border-radius: 1rem;
+              padding: 1.5rem;
+              margin-bottom: 2rem;
+              text-align: center;
+            }
+
+            .score-details {
+              display: flex;
+              justify-content: center;
+              gap: 2rem;
+              margin-top: 1rem;
+            }
+
+            .score-item {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+
+            .score-number {
+              font-size: 2rem;
+              font-weight: bold;
+            }
+
+            .score-label {
+              font-size: 0.9rem;
+              opacity: 0.7;
+            }
+          `;
+          document.head.appendChild(style);
         }
 
         /*************************************************************************************************
