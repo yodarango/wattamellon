@@ -151,169 +151,173 @@
             align-items: center;
             justify-content: center;
             gap: 1.6rem;
+      }
 
-            .thumbnail {
+      .thumbnail {
+            width: 100%;
+            max-width: 20rem;
+            margin: auto;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+      }
+
+      input {
+            width: 100%;
+            border: 1px solid var(--dr-delta);
+            border-radius: 2rem;
+            padding: 1.6rem;
+            display: block;
+      }
+
+      .btn-primary{
+            background-color: var(--dr-delta);
+            color: var(--dr-alpha);
+            padding: 1.6rem 2rem;
+            border-radius: 2rem;
+            border: none;
+            cursor: pointer;
+      }
+
+      .btn-secondary{
+            background-color: rgba(var(--dr-alpha-rgb), 0.2);
+            color: var(--dr-alpha);
+            display: block;
+            padding: 1.6rem 2rem;
+            border-radius: 2rem;
+            border: .1rem solid rgba(var(--dr-alpha-rgb), 0.25);
+            cursor: pointer;
+      }
+
+
+      #avatar-dialog {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(var(--dr-delta-rgb), 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+      }
+
+      .dialog-content {
+            background-color: var(--dr-beta);
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+      }
+
+      .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--dr-beta);
+            border-bottom: 1px solid var(--dr-omicron);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+      }
+
+      .close-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+      }
+
+      .avatars-container {
+            padding: 1rem 2rem;
+            overflow-y: auto;
+            max-height: calc(80vh - 120px);
+      }
+
+      .avatars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+      }
+
+      .avatar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+      }
+
+      .avatar-item:hover {
+            background-color: var(--dr-gamma);
+      }
+
+      .avatar-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+      }
+
+      .avatar-item p {
+            font-size: 0.8rem;
+            text-align: center;
+            margin: 0;
+      }
+
+      .load-more-container {
+            padding: 1rem;
+            background-color: var(--dr-beta);
+            border-top: 1px solid var(--dr-omicron);
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+      }
+
+      .load-more {
+            display: block;
+            margin: 0 auto;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--dr-delta);
+            color: var(--dr-alpha);
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            width: 100%;
+            max-width: 200px;
+      }
+
+      .selected-avatar {
+            background-color: var(--dr-gamma);
+      }
+
+      #selected_avatar_display {
+            display: none;
+            background-color: rgba(var(--dr-delta-rgb), 0.4);
+            padding: var(--dr-spacing-4);
+            border: .1rem solid var(--dr-delta);
+            border-radius: 2rem;
+
+            img {
                   width: 100%;
-                  max-width: 20rem;
-                  margin: auto;
+                  max-width: 10rem;
                   object-fit: contain;
                   object-position: center;
-                  display: block;
             }
+      }
 
-            input {
-                  width: 100%;
-                  border: 1px solid var(--dr-delta);
-                  border-radius: 2rem;
-                  padding: 1.6rem;
-                  display: block;
-            }
-
-            .btn-primary{
-                  background-color: var(--dr-delta);
-                  color: var(--dr-alpha);
-                  padding: 1.6rem 2rem;
-                  border-radius: 2rem;
-                  border: none;
-                  cursor: pointer;
-            }
-
-            .btn-secondary{
-                  background-color: rgba(var(--dr-alpha-rgb), 0.2);
-                  color: var(--dr-alpha);
-                  display: block;
-                  padding: 1.6rem 2rem;
-                  border-radius: 2rem;
-                  border: .1rem solid rgba(var(--dr-alpha-rgb), 0.25);
-                  cursor: pointer;
-            }
-
-
-            #avatar-dialog {
-                  display: none;
-                  position: fixed;
-                  top: 0;
-                  left: 0;
-                  width: 100%;
-                  height: 100%;
-                  background-color: rgba(var(--dr-delta-rgb), 0.5);
-                  z-index: 1000;
-                  overflow-y: auto;
-            }
-
-            .dialog-content {
-                  background-color: var(--dr-beta);
-                  margin: 10% auto;
-                  padding: 0;
-                  border-radius: 1rem;
-                  width: 90%;
-                  max-width: 600px;
-                  max-height: 80vh;
-                  overflow-y: hidden;
-                  display: flex;
-                  flex-direction: column;
-                  position: relative;
-            }
-
-            .dialog-header {
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  padding: 1rem 2rem;
-                  background-color: var(--dr-beta);
-                  border-bottom: 1px solid var(--dr-omicron);
-                  position: sticky;
-                  top: 0;
-                  z-index: 10;
-            }
-
-            .close-button {
-                  background: none;
-                  border: none;
-                  font-size: 1.5rem;
-                  cursor: pointer;
-            }
-
-            .avatars-container {
-                  padding: 1rem 2rem;
-                  overflow-y: auto;
-                  max-height: calc(80vh - 120px);
-            }
-
-            .avatars-grid {
-                  display: grid;
-                  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-                  gap: 1rem;
-                  margin-bottom: 1rem;
-            }
-
-            .avatar-item {
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  cursor: pointer;
-                  padding: 0.5rem;
-                  border-radius: 0.5rem;
-                  transition: background-color 0.2s;
-            }
-
-            .avatar-item:hover {
-                  background-color: var(--dr-gamma);
-            }
-
-            .avatar-item img {
-                  width: 80px;
-                  height: 80px;
-                  object-fit: contain;
-                  margin-bottom: 0.5rem;
-            }
-
-            .avatar-item p {
-                  font-size: 0.8rem;
-                  text-align: center;
-                  margin: 0;
-            }
-
-            .load-more-container {
-                  padding: 1rem;
-                  background-color: var(--dr-beta);
-                  border-top: 1px solid var(--dr-omicron);
-                  position: sticky;
-                  bottom: 0;
-                  z-index: 10;
-            }
-
-            .load-more {
-                  display: block;
-                  margin: 0 auto;
-                  padding: 0.8rem 1.5rem;
-                  background-color: var(--dr-delta);
-                  color: var(--dr-alpha);
-                  border: none;
-                  border-radius: 1rem;
-                  cursor: pointer;
-                  width: 100%;
-                  max-width: 200px;
-            }
-
-            .selected-avatar {
-                  background-color: var(--dr-gamma);
-            }
-
-            #selected_avatar_display {
-                  display: none;
-                  background-color: rgba(var(--dr-delta-rgb), 0.4);
-                  padding: var(--dr-spacing-4);
-                  border: .1rem solid var(--dr-delta);
-                  border-radius: 2rem;
-
-                  img {
-                        width: 100%;
-                        max-width: 10rem;
-                        object-fit: contain;
-                        object-position: center;
-                  }
-            }
+      #game-container-done{
+            margin: 5rem auto 0;
       }
     </style>
 
@@ -364,14 +368,19 @@
 
       <!-- this is the finished game session -->
       <div id="game-container-done">
-        <h2>Game Complete!</h2>
-        <button onclick="submitGame()" >Submit Answers</button>
+         <h2 class="text-center mb-4">Great, you're done</h2>
+         <img src="/public/images/thank_you_4000.webp" class="thumbnail" />
+         <button onclick="submitGame()" class="btn-primary w-100" >Submit Answers</button>
       </div>
 
       <!-- The game has been submitted. There is nothing else to see here  -->
       <div id="game-container-submitted">
-        <h2>Game Submitted!</h2>
-        <button onclick="navigateToView()">See who has answered id</button>
+        <h2 class="text-center mb-4">Game Submitted!</h2>
+         <img src="/public/images/search_4000.webp" class="thumbnail" />
+         <p>Find out who knows you best!</p>
+        <button onclick="shareGameLink()" class="btn-primary w-100 mb-4">Share Game Link</button>
+         <p>You can also see who has answered your questions.</p>
+        <button onclick="navigateToView()" class="btn-secondary w-100">See who has played</button>
       </div>
       <script>
         // Avatar selection variables
@@ -524,6 +533,15 @@
         function navigateToView() {
           const { game_id, creatorToken } = getGameTokenFromLocalStorage();
           window.location.href = "/view/" + game_id;
+        }
+
+        /*************************************************************************************************
+         * Copy the game link to the clipboard so the user can share it
+         * **********************************************************************************************/
+        function shareGameLink(){
+            const { game_id, creatorToken } = getGameTokenFromLocalStorage();
+            navigator.clipboard.writeText(window.location.origin + "/view/" + game_id);
+            alert("Link copied!");
         }
 
         /*************************************************************************************************
