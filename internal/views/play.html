@@ -277,11 +277,11 @@
       }
 
       .correct-color {
-        background-color: #4CAF50;
+        background-color: var(--dr-success, #4CAF50);
       }
 
       .incorrect-color {
-        background-color: #FF5252;
+        background-color: var(--dr-danger, #FF5252);
       }
 
       .legend-label {
@@ -692,10 +692,7 @@
           scoreSummary.innerHTML = `
             <h3>Your Score: ${scorePercentage}%</h3>
             <div class="pie-chart-container">
-              <div class="pie-chart" style="background-image: conic-gradient(
-                #4CAF50 0deg ${correctAngle}deg,
-                #FF5252 ${correctAngle}deg 360deg
-              )"></div>
+              <div class="pie-chart" id="results-pie-chart"></div>
               <div class="pie-chart-legend">
                 <div class="legend-item">
                   <span class="legend-color correct-color"></span>
@@ -722,6 +719,18 @@
           resultsContainer.appendChild(scoreSummary);
           resultsContainer.appendChild(breakdownTitle);
           resultsContainer.appendChild(accordionContainer);
+
+          // Get CSS variables for colors
+          const computedStyle = getComputedStyle(document.documentElement);
+          const successColor = computedStyle.getPropertyValue('--dr-success') || '#4CAF50';
+          const dangerColor = computedStyle.getPropertyValue('--dr-danger') || '#FF5252';
+
+          // Set the pie chart gradient using CSS variables
+          const pieChart = document.getElementById('results-pie-chart');
+          pieChart.style.backgroundImage = `conic-gradient(
+            ${successColor} 0deg ${correctAngle}deg,
+            ${dangerColor} ${correctAngle}deg 360deg
+          )`;
 
           // Add each question as an accordion item
           Object.keys(answers).forEach((key, index) => {
