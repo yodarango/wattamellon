@@ -229,28 +229,104 @@
       }
 
       #game-results h3 {
-        font-size: 1.5rem;
         margin: 1.5rem 0 1rem;
       }
 
-      #game-results h4 {
-        font-size: 1.2rem;
-        margin: 1rem 0 0.5rem;
-      }
-
-      #game-results .correct,
-      #game-results .incorrect {
-        padding: 1.5rem;
+      /* Score summary styles */
+      .score-summary {
+        background-color: var(--dr-gamma);
         border-radius: 1rem;
-        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
       }
 
-      #game-results .correct {
+      .score-details {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1rem;
+      }
+
+      .score-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .score-number {
+        font-size: 2rem;
+        font-weight: bold;
+      }
+
+      .score-label {
+        font-size: 0.9rem;
+        opacity: 0.7;
+      }
+
+      /* Accordion styles */
+      .accordion-container {
+        width: 100%;
+      }
+
+      .accordion-item {
+        margin-bottom: 1rem;
+        border-radius: 1rem;
+      }
+
+      .accordion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border-radius: 1rem;
+      }
+
+      .accordion-icon {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .accordion-plus {
+        display: inline-block;
+      }
+
+      .accordion-minus {
+        display: none;
+      }
+
+      .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease;
+        padding: 0 1.5rem;
+
+        p{
+            text-align: left;
+        }
+      }
+
+      .accordion-item.active .accordion-content {
+        padding-bottom: 1rem;
+        max-height: 20rem;
+      }
+
+      .accordion-item.active .accordion-plus {
+        display: none;
+      }
+
+      .accordion-item.active .accordion-minus {
+        display: inline-block;
+      }
+
+      .accordion-item.correct {
         background-color: rgba(0, 200, 0, 0.1);
         border: 1px solid rgba(0, 200, 0, 0.3);
       }
 
-      #game-results .incorrect {
+      .accordion-item.incorrect {
         background-color: rgba(255, 0, 0, 0.1);
         border: 1px solid rgba(255, 0, 0, 0.3);
       }
@@ -295,6 +371,7 @@
       <!-- The user has finished and submitted the game. They will see the stats here-->
       <div id="game-container-submitted">
         <h2>Results for {{.Game.Name}}</h2>
+        <img src="/public/images/search_4000.webp" class="thumbnail" />
         <p>Here's how well you know {{.Game.PlayerName}}:</p>
         <div id="game-results"></div>
       </div>
@@ -599,60 +676,40 @@
           </div>
 
           <h3>Answer Breakdown:</h3>
-          ${Object.keys(answers)
-            .map((key) => {
-              const question = categories[key].question;
-              const selectedOption =
-                categories[key]["options"][answers[key].selection];
-              const creatorSelectOption =
-                categories[key]["options"][gameQuestionsParsed[key].selection];
-              const isCorrect = answers[key].isCorrect;
-              return `
-              <div class="${isCorrect ? "correct" : "incorrect"}">
-                <h4>${question}</h4>
-                <p><strong>Your answer:</strong> ${selectedOption}</p>
-                <p><strong>${isCorrect ? "Correct!" : "Correct answer was:"}</strong> ${creatorSelectOption}</p>
-              </div>
-            `;
-            })
-            .join("")}
+          <div class="accordion-container">
+            ${Object.keys(answers)
+              .map((key, index) => {
+                const question = categories[key].question;
+                const selectedOption =
+                  categories[key]["options"][answers[key].selection];
+                const creatorSelectOption =
+                  categories[key]["options"][gameQuestionsParsed[key].selection];
+                const isCorrect = answers[key].isCorrect;
+                return `
+                <div class="accordion-item ${isCorrect ? "correct" : "incorrect"}">
+                  <div class="accordion-header" onclick="toggleAccordion(${index})">
+                    <p>${question}</p>
+                    <div class="accordion-icon">
+                      <span class="accordion-plus">+</span>
+                      <span class="accordion-minus">−</span>
+                    </div>
+                  </div>
+                  <div class="accordion-content">
+                    <p><strong>Your answer:</strong> ${selectedOption}</p>
+                    <p><strong>${isCorrect ? "Correct!" : "Correct answer was:"}</strong> ${creatorSelectOption}</p>
+                  </div>
+                </div>
+              `;
+              })
+              .join("")}
+          </div>
         `;
 
-          // Add styles for the score summary
-          const style = document.createElement('style');
-          style.textContent = `
-            .score-summary {
-              background-color: var(--dr-gamma);
-              border-radius: 1rem;
-              padding: 1.5rem;
-              margin-bottom: 2rem;
-              text-align: center;
-            }
-
-            .score-details {
-              display: flex;
-              justify-content: center;
-              gap: 2rem;
-              margin-top: 1rem;
-            }
-
-            .score-item {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-            }
-
-            .score-number {
-              font-size: 2rem;
-              font-weight: bold;
-            }
-
-            .score-label {
-              font-size: 0.9rem;
-              opacity: 0.7;
-            }
-          `;
-          document.head.appendChild(style);
+          // Add the toggle function for the accordion
+          window.toggleAccordion = function(index) {
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            accordionItems[index].classList.toggle('active');
+          };
         }
 
         /*************************************************************************************************
