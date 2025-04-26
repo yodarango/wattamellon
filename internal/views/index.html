@@ -90,6 +90,61 @@
         display: none;
       }
 
+      #game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 2rem;
+        padding: 2rem 0;
+        margin: 5rem auto 0;
+      }
+
+      #game-container h4 {
+        font-size: 1.2rem;
+        color: var(--dr-alpha);
+        opacity: 0.7;
+        margin: 0;
+      }
+
+      #game-container h3 {
+        font-size: 1.8rem;
+        margin: 0.5rem 0 1.5rem;
+      }
+
+      .options-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        width: 100%;
+      }
+
+      .option-card {
+        background-color: rgba(var(--dr-alpha-rgb), 0.2);
+        color: var(--dr-alpha);
+        border: 0.1rem solid rgba(var(--dr-alpha-rgb), 0.25);
+        border-radius: 2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: var(--dr-spacing-4);
+        aspect-ratio: 1/1;
+        font-size: 1.2rem;
+        transition: all 0.2s ease;
+      }
+
+      .option-card:hover {
+        background-color:  rgba(var(--dr-alpha-rgb), 0.4);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        scale: .9;
+        color: var(--dr-beta);
+        transform: translateY(-3px);
+        transition: 300ms;
+      }
+
       #create-form {
             display: flex;
             flex-direction: column;
@@ -591,20 +646,28 @@
             const selectedOptions = getRandomOptions(options);
 
             container.innerHTML = "";
+
+            // Create question counter
             const h4 = document.createElement("h4");
             h4.textContent = `Question ${currentIndex + 1} of ${
               categorieKeys.length
             }`;
             container.appendChild(h4);
 
+            // Create question text
             const h3 = document.createElement("h3");
             h3.textContent = question;
             container.appendChild(h3);
 
+            // Create options container
+            const optionsContainer = document.createElement("div");
+            optionsContainer.className = "options-container";
+            container.appendChild(optionsContainer);
+
             // when the user clicks on the card, we need to update the game token with the selected option but also with the two options given to them so that the player can see the same options they had
             selectedOptions.forEach((option) => {
               const card = document.createElement("div");
-              card.className = "card";
+              card.className = "option-card";
               card.textContent = option.value;
               card.onclick = () => {
                 currentIndex++;
@@ -617,7 +680,7 @@
                 updateGameToken(gameToken);
                 showNextQuestion();
               };
-              container.appendChild(card);
+              optionsContainer.appendChild(card);
             });
           }
 
