@@ -8,9 +8,81 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script
+      defer=""
+      data-domain="shrood.app"
+      src="https://plausible.io/js/script.js"
+    ></script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create a Game</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=no"
+    />
+
+    <link rel="canonical" href="https://shrood.app/apps/wattamellon" />
+    <link rel="alternate" hreflang="en" href="https://shrood.app" />
+    <meta property="og:site_name" content="Shrood" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Wattamellon - How well do you know me?"
+    />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      name="twitter:title"
+      content="Wattamellon - How well do you know me?"
+    />
+    <meta property="og:article:author" content="Daniel Rangel" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@shrood" />
+    <meta name="twitter:creator" content="@yodarango" />
+    <meta
+      property="og:image"
+      content="/public/images/web_hosted_apps/wattamellon.webp"
+    />
+    <meta
+      name="keywords"
+      content="Wattamellon, friendship trivia game, who knows me best, social quiz app, funny friend quiz, viral quiz game, party game, friend group challenge, quiz about me, best friend test, fun with friends, get to know your friends, who knows you better, multiplayer quiz"
+    />
+
+    <meta
+      name="description"
+      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
+    />
+    <meta property="og:url" content="https://shrood.app/apps/wattamellon" />
+    <meta
+      property="og:description"
+      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
+    />
+    <meta
+      name="twitter:description"
+      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
+    />
+    <meta
+      name="twitter:image"
+      content="/public/images/web_hosted_apps/wattamellon.webp"
+    />
+
+    <link
+      rel="apple-touch-icon"
+      href="/public/images/web_hosted_apps/wattamellon.webp"
+    />
+    <link rel="manifest" href="/public/manifest.json" />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.danielrangel.net/fullds.min.css"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="/public/images/logo_round_pow_smalll.png"
+    />
+
+    <title>Shrood | Wattamellon - {{.Name}} - How well do you know me?</title>
     <style>
       #game-container,
       #game-container-done,
@@ -18,308 +90,312 @@
         display: none;
       }
     </style>
+
     <script src="/public/categories_db.js"></script>
+    <link       rel="stylesheet"
+      type="text/css" href="/public/app.css"></link>
   </head>
   <body>
-    <!-- The user is startign an existing game  -->
-    <div id="start-game-session">
-      <h1>Start Playing {{.Game.Name}} by {{.Game.PlayerName}}</h1>
-      <input type="text" id="player_name" placeholder="Your Name" />
-      <!-- Not allowing users to pick size for now -->
-      <input type="hidden" id="gameId" value="{{.Game.ID}}" />
-      <button onclick="createGame()">Start Game</button>
-    </div>
+    <main>
+      <!-- The user is startign an existing game  -->
+      <div id="start-game-session">
+        <h1>Start Playing {{.Game.Name}} by {{.Game.PlayerName}}</h1>
+        <input type="text" id="player_name" placeholder="Your Name" />
+        <!-- Not allowing users to pick size for now -->
+        <input type="hidden" id="gameId" value="{{.Game.ID}}" />
+        <button onclick="createGame()">Start Game</button>
+      </div>
 
-    <!-- The user has already started the game but has not finished it yet -->
-    <div id="game-container"></div>
+      <!-- The user has already started the game but has not finished it yet -->
+      <div id="game-container"></div>
 
-    <!-- The has been finished but not sumitted  -->
-    <div id="game-container-done">
-      <h2>You have completed this game. You may send you anwers now!</h2>
-      <button onclick="submitGame()">Submit</button>
-    </div>
+      <!-- The has been finished but not sumitted  -->
+      <div id="game-container-done">
+        <h2>You have completed this game. You may send you anwers now!</h2>
+        <button onclick="submitGame()">Submit</button>
+      </div>
 
-    <!-- The user has finished and sumbimitted the game. They will see the stats here-->
-    <div id="game-container-submitted">
-      <h2>You have completed {name} by {playr name}.</h2>
-      <p>here is how you did</p>
-      <div id="game-results"></div>
-    </div>
+      <!-- The user has finished and sumbimitted the game. They will see the stats here-->
+      <div id="game-container-submitted">
+        <h2>You have completed {name} by {playr name}.</h2>
+        <p>here is how you did</p>
+        <div id="game-results"></div>
+      </div>
 
-    <script>
-      /*************************************************************************************************
-       * Four screens are possible:
-       * 1. Create a game player (default)
-       * 2. Play the game (the user ahs submitted the game player information)
-       * 3. Game is done (the user has answered all the questions but not submitted)
-       * 4. Game is submitted (the user has submitted the game)
-       * *****************************************************************************/
-      document.addEventListener("DOMContentLoaded", () => {
-        const gameToken = getGameToken();
-        if (gameToken.game_id) {
-          if (gameToken.is_submitted) {
-            updateFinalResults();
+      <script>
+        /*************************************************************************************************
+         * Four screens are possible:
+         * 1. Create a game player (default)
+         * 2. Play the game (the user ahs submitted the game player information)
+         * 3. Game is done (the user has answered all the questions but not submitted)
+         * 4. Game is submitted (the user has submitted the game)
+         * *****************************************************************************/
+        document.addEventListener("DOMContentLoaded", () => {
+          const gameToken = getGameToken();
+          if (gameToken.game_id) {
+            if (gameToken.is_submitted) {
+              updateFinalResults();
 
-            renderView("submitted");
-            return;
+              renderView("submitted");
+              return;
+            }
+
+            if (gameToken.is_complete) {
+              renderView("done");
+              return;
+            }
+
+            renderView("game");
+          } else {
+            renderView("create");
           }
-
-          if (gameToken.is_complete) {
-            renderView("done");
-            return;
-          }
-
-          renderView("game");
-        } else {
-          renderView("create");
-        }
-      });
-
-      /*************************************************************************************************
-       * Get and return the game token from the local storage
-       * **********************************************************************************************/
-      function getGameToken() {
-        let gameToken = localStorage.getItem("wattamellon_token_player");
-        gameToken = JSON.parse(gameToken || "{}");
-        return gameToken;
-      }
-
-      /*************************************************************************************************
-       * Give me an array and I will return a random selection of 2 options
-       * **********************************************************************************************/
-      function getRandomOptions(options) {
-        const keys = Object.keys(options);
-        shuffleArray(keys);
-        return keys
-          .slice(0, 2)
-          .map((key) => ({ id: key, value: options[key] }));
-      }
-
-      /*************************************************************************************************
-       * Give me an array and I will shuffle it. I will NOT return anything. I modify the original
-       * **********************************************************************************************/
-      function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
-        }
-      }
-
-      /*************************************************************************************************
-       * The new game session is created here. The user will be able to select the answers to the
-       * **********************************************************************************************/
-      async function createGame() {
-        // Generates a random token for the game
-        function generateToken() {
-          let token = "";
-          const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-          for (let i = 0; i < 25; i++) {
-            token += chars.charAt(Math.floor(Math.random() * chars.length));
-          }
-          return token;
-        }
-
-        const playerName = document.getElementById("player_name").value;
-        const gameId = document.getElementById("gameId").value;
-        const playerToken = generateToken();
-
-        // alert the user if they have not selected a thumbnail or have not entered a name
-        if (!playerName) {
-          alert("Please enter your name");
-          return;
-        }
-
-        const res = await fetch("/new-game-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            player_token: playerToken,
-            player_name: playerName,
-            game_id: Number(gameId),
-            answers: "{}",
-          }),
         });
 
-        const { data, success } = await res.json();
+        /*************************************************************************************************
+         * Get and return the game token from the local storage
+         * **********************************************************************************************/
+        function getGameToken() {
+          let gameToken = localStorage.getItem("wattamellon_token_player");
+          gameToken = JSON.parse(gameToken || "{}");
+          return gameToken;
+        }
 
-        // get the questions from the game and set up an empty answer for each one to start with
-        const gameQuestions = `{{.Game.Questions}}`;
-        const gameQuestionsParsed = JSON.parse(gameQuestions);
-        const gameQuestionsKeys = Object.keys(gameQuestionsParsed);
+        /*************************************************************************************************
+         * Give me an array and I will return a random selection of 2 options
+         * **********************************************************************************************/
+        function getRandomOptions(options) {
+          const keys = Object.keys(options);
+          shuffleArray(keys);
+          return keys
+            .slice(0, 2)
+            .map((key) => ({ id: key, value: options[key] }));
+        }
 
-        const emtpyAnswers = gameQuestionsKeys.reduce((acc, key) => {
-          acc[key] = "";
-          return acc;
-        }, {});
+        /*************************************************************************************************
+         * Give me an array and I will shuffle it. I will NOT return anything. I modify the original
+         * **********************************************************************************************/
+        function shuffleArray(array) {
+          for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+          }
+        }
 
-        if (success) {
-          // update the game token with the order of the questions
-          if (!(Object.keys(playerToken.questions || {}) > 0)) {
-            updateGameToken({
-              player_token: data.player_token,
-              game_id: data.game_id,
-              answers: emtpyAnswers,
-              is_complete: false,
-              current_index: 0,
-              success_rate: 0,
-              id: data.id,
+        /*************************************************************************************************
+         * The new game session is created here. The user will be able to select the answers to the
+         * **********************************************************************************************/
+        async function createGame() {
+          // Generates a random token for the game
+          function generateToken() {
+            let token = "";
+            const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+            for (let i = 0; i < 25; i++) {
+              token += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return token;
+          }
+
+          const playerName = document.getElementById("player_name").value;
+          const gameId = document.getElementById("gameId").value;
+          const playerToken = generateToken();
+
+          // alert the user if they have not selected a thumbnail or have not entered a name
+          if (!playerName) {
+            alert("Please enter your name");
+            return;
+          }
+
+          const res = await fetch("/new-game-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              player_token: playerToken,
+              player_name: playerName,
+              game_id: Number(gameId),
+              answers: "{}",
+            }),
+          });
+
+          const { data, success } = await res.json();
+
+          // get the questions from the game and set up an empty answer for each one to start with
+          const gameQuestions = `{{.Game.Questions}}`;
+          const gameQuestionsParsed = JSON.parse(gameQuestions);
+          const gameQuestionsKeys = Object.keys(gameQuestionsParsed);
+
+          const emtpyAnswers = gameQuestionsKeys.reduce((acc, key) => {
+            acc[key] = "";
+            return acc;
+          }, {});
+
+          if (success) {
+            // update the game token with the order of the questions
+            if (!(Object.keys(playerToken.questions || {}) > 0)) {
+              updateGameToken({
+                player_token: data.player_token,
+                game_id: data.game_id,
+                answers: emtpyAnswers,
+                is_complete: false,
+                current_index: 0,
+                success_rate: 0,
+                id: data.id,
+              });
+            }
+            renderView("game");
+          } else {
+            alert("Error creating game: " + data.error);
+          }
+        }
+
+        /*************************************************************************************************
+         * I am responsible for three things:
+         * 1. Rendering the cards on the initial load
+         * 2. Rendering the next cards when the user selects one option
+         * 3. Updating the game token with the current game state
+         * **********************************************************************************************/
+        function renderCards() {
+          // get the game token from the local storage, so the state is preserved
+          const gameToken = getGameToken();
+          const categorieKeys = Object.keys(gameToken.answers);
+
+          // also get the current index of the game so we know which question to show
+          let currentIndex = gameToken.current_index;
+
+          // I need to append to this container the current question and the options
+          const container = document.getElementById("game-container");
+
+          function showNextQuestion() {
+            if (currentIndex >= categorieKeys.length) {
+              renderView("done");
+              return;
+            }
+
+            // based on the current index, get the current category key
+            const categoryKey = categorieKeys[currentIndex];
+
+            // based on the current category key, get the question
+            const { question, options } = categories[categoryKey];
+            // and also the options
+            const gameQuestions = `{{.Game.Questions}}`;
+            const selectedOptionsParsed = JSON.parse(gameQuestions);
+            const selectedOptions = selectedOptionsParsed[categoryKey].options;
+
+            container.innerHTML = "";
+            const h4 = document.createElement("h4");
+            h4.textContent = `Question ${currentIndex + 1} of ${
+              categorieKeys.length
+            }`;
+            container.appendChild(h4);
+
+            const h3 = document.createElement("h3");
+            h3.textContent = question;
+            container.appendChild(h3);
+
+            // when the user selects an option, also let them know if they are correct or not
+            selectedOptions.forEach((option) => {
+              const card = document.createElement("div");
+              card.className = "card";
+              card.textContent = option.value;
+              card.onclick = () => {
+                currentIndex++;
+                gameToken.answers[categoryKey] = {
+                  selection: option.id,
+                  isCorrect:
+                    option.id === selectedOptionsParsed[categoryKey].selection,
+                };
+                gameToken.current_index = currentIndex;
+                gameToken.is_complete = currentIndex >= categorieKeys.length;
+                updateGameToken(gameToken);
+                showNextQuestion();
+              };
+              container.appendChild(card);
             });
           }
-          renderView("game");
-        } else {
-          alert("Error creating game: " + data.error);
+
+          // call the function on initial load
+          showNextQuestion();
         }
-      }
 
-      /*************************************************************************************************
-       * I am responsible for three things:
-       * 1. Rendering the cards on the initial load
-       * 2. Rendering the next cards when the user selects one option
-       * 3. Updating the game token with the current game state
-       * **********************************************************************************************/
-      function renderCards() {
-        // get the game token from the local storage, so the state is preserved
-        const gameToken = getGameToken();
-        const categorieKeys = Object.keys(gameToken.answers);
+        /*************************************************************************************************
+         * This function is responsible for submitting the game. It will send the answers to the server
+         * and if successful, it will alert the user and display the results
+         * **********************************************************************************************/
+        async function submitGame() {
+          // check that the user has answered all the questions
 
-        // also get the current index of the game so we know which question to show
-        let currentIndex = gameToken.current_index;
+          const gameToken = getGameToken();
+          const { player_token, id, answers } = gameToken;
 
-        // I need to append to this container the current question and the options
-        const container = document.getElementById("game-container");
+          // now, based on the answer values and the game questions, check the total number of questions
+          // answered correctly and incorrectly.
+          const gameQuestions = JSON.parse(`{{.Game.Questions}}`);
+          let incorrectAnswers = Object.keys(answers).filter(
+            (key) => answers[key].isCorrect === false
+          ).length;
+          let correctAnswers = Object.keys(answers).filter(
+            (key) => answers[key].isCorrect === true
+          ).length;
 
-        function showNextQuestion() {
-          if (currentIndex >= categorieKeys.length) {
-            renderView("done");
+          // check if the user has answered all the questions
+          let isComplete = true;
+          Object.keys(gameQuestions).forEach((key) => {
+            if (!answers[key]) {
+              isComplete = false;
+            }
+          });
+
+          const successRate =
+            (correctAnswers / Object.keys(gameQuestions).length) * 100;
+
+          if (!isComplete) {
+            alert("Please answer all the questions before submitting");
             return;
           }
 
-          // based on the current index, get the current category key
-          const categoryKey = categorieKeys[currentIndex];
-
-          // based on the current category key, get the question
-          const { question, options } = categories[categoryKey];
-          // and also the options
-          const gameQuestions = `{{.Game.Questions}}`;
-          const selectedOptionsParsed = JSON.parse(gameQuestions);
-          const selectedOptions = selectedOptionsParsed[categoryKey].options;
-
-          container.innerHTML = "";
-          const h4 = document.createElement("h4");
-          h4.textContent = `Question ${currentIndex + 1} of ${
-            categorieKeys.length
-          }`;
-          container.appendChild(h4);
-
-          const h3 = document.createElement("h3");
-          h3.textContent = question;
-          container.appendChild(h3);
-
-          // when the user selects an option, also let them know if they are correct or not
-          selectedOptions.forEach((option) => {
-            const card = document.createElement("div");
-            card.className = "card";
-            card.textContent = option.value;
-            card.onclick = () => {
-              currentIndex++;
-              gameToken.answers[categoryKey] = {
-                selection: option.id,
-                isCorrect:
-                  option.id === selectedOptionsParsed[categoryKey].selection,
-              };
-              gameToken.current_index = currentIndex;
-              gameToken.is_complete = currentIndex >= categorieKeys.length;
-              updateGameToken(gameToken);
-              showNextQuestion();
-            };
-            container.appendChild(card);
+          const res = await fetch("/submit-game-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              answers: JSON.stringify(answers),
+              success_rate: successRate,
+              player_token,
+              id,
+            }),
           });
-        }
 
-        // call the function on initial load
-        showNextQuestion();
-      }
+          const data = await res.json();
+          if (data.success) {
+            gameToken.incorrect_answers = incorrectAnswers;
+            gameToken.correct_answers = correctAnswers;
+            gameToken.success_rate = successRate;
+            gameToken.is_submitted = true;
+            updateGameToken(gameToken);
 
-      /*************************************************************************************************
-       * This function is responsible for submitting the game. It will send the answers to the server
-       * and if successful, it will alert the user and display the results
-       * **********************************************************************************************/
-      async function submitGame() {
-        // check that the user has answered all the questions
+            updateFinalResults();
 
-        const gameToken = getGameToken();
-        const { player_token, id, answers } = gameToken;
-
-        // now, based on the answer values and the game questions, check the total number of questions
-        // answered correctly and incorrectly.
-        const gameQuestions = JSON.parse(`{{.Game.Questions}}`);
-        let incorrectAnswers = Object.keys(answers).filter(
-          (key) => answers[key].isCorrect === false
-        ).length;
-        let correctAnswers = Object.keys(answers).filter(
-          (key) => answers[key].isCorrect === true
-        ).length;
-
-        // check if the user has answered all the questions
-        let isComplete = true;
-        Object.keys(gameQuestions).forEach((key) => {
-          if (!answers[key]) {
-            isComplete = false;
+            alert("Game submitted! You can now view the results.");
+            renderView("submitted");
+          } else {
+            alert("Error submitting game.");
           }
-        });
-
-        const successRate =
-          (correctAnswers / Object.keys(gameQuestions).length) * 100;
-
-        if (!isComplete) {
-          alert("Please answer all the questions before submitting");
-          return;
         }
 
-        const res = await fetch("/submit-game-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            answers: JSON.stringify(answers),
-            success_rate: successRate,
-            player_token,
-            id,
-          }),
-        });
+        /*************************************************************************************************
+         * Update the results of the game. Show the total percentage as well as the correct and incorrect
+         * answers.
+         * **********************************************************************************************/
+        function updateFinalResults() {
+          const gameToken = getGameToken();
+          const { answers, success_rate, correct_answers, incorrect_answers } =
+            gameToken;
 
-        const data = await res.json();
-        if (data.success) {
-          gameToken.incorrect_answers = incorrectAnswers;
-          gameToken.correct_answers = correctAnswers;
-          gameToken.success_rate = successRate;
-          gameToken.is_submitted = true;
-          updateGameToken(gameToken);
+          const resultsContainer = document.getElementById("game-results");
 
-          updateFinalResults();
+          // game questions
+          const gameQuestions = `{{.Game.Questions}}`;
+          const gameQuestionsParsed = JSON.parse(gameQuestions);
 
-          alert("Game submitted! You can now view the results.");
-          renderView("submitted");
-        } else {
-          alert("Error submitting game.");
-        }
-      }
-
-      /*************************************************************************************************
-       * Update the results of the game. Show the total percentage as well as the correct and incorrect
-       * answers.
-       * **********************************************************************************************/
-      function updateFinalResults() {
-        const gameToken = getGameToken();
-        const { answers, success_rate, correct_answers, incorrect_answers } =
-          gameToken;
-
-        const resultsContainer = document.getElementById("game-results");
-
-        // game questions
-        const gameQuestions = `{{.Game.Questions}}`;
-        const gameQuestionsParsed = JSON.parse(gameQuestions);
-
-        resultsContainer.innerHTML = `
+          resultsContainer.innerHTML = `
           <h3>Success Rate: ${success_rate}%</h3>
           <h4>Correct Answers: ${correct_answers}</h4>
           <h4>Incorrect Answers: ${incorrect_answers}</h4>
@@ -342,62 +418,70 @@
             })
             .join("")}
         `;
-      }
-
-      /*************************************************************************************************
-       * It will hide and show the right elements based on the view that is passed in
-       * **********************************************************************************************/
-      function renderView(view) {
-        switch (view) {
-          case "create":
-            document.getElementById("start-game-session").style.display =
-              "block";
-            document.getElementById("game-container").style.display = "none";
-            document.getElementById("game-container-done").style.display =
-              "none";
-            document.getElementById("game-container-submitted").style.display =
-              "none";
-            break;
-          case "game":
-            document.getElementById("start-game-session").style.display =
-              "none";
-            document.getElementById("game-container").style.display = "block";
-            document.getElementById("game-container-done").style.display =
-              "none";
-            document.getElementById("game-container-submitted").style.display =
-              "none";
-            renderCards();
-            break;
-          case "done":
-            document.getElementById("start-game-session").style.display =
-              "none";
-            document.getElementById("game-container").style.display = "none";
-            document.getElementById("game-container-done").style.display =
-              "block";
-            document.getElementById("game-container-submitted").style.display =
-              "none";
-            break;
-
-          case "submitted":
-            document.getElementById("start-game-session").style.display =
-              "none";
-            document.getElementById("game-container").style.display = "none";
-            document.getElementById("game-container-done").style.display =
-              "none";
-            document.getElementById("game-container-submitted").style.display =
-              "block";
-
-          default:
-            break;
         }
-      }
 
-      /*************************************************************************************************
-       * Give me a token and I will update the local storage with the token. I already know the key
-       * **********************************************************************************************/
-      function updateGameToken(token) {
-        localStorage.setItem("wattamellon_token_player", JSON.stringify(token));
-      }
-    </script>
+        /*************************************************************************************************
+         * It will hide and show the right elements based on the view that is passed in
+         * **********************************************************************************************/
+        function renderView(view) {
+          switch (view) {
+            case "create":
+              document.getElementById("start-game-session").style.display =
+                "block";
+              document.getElementById("game-container").style.display = "none";
+              document.getElementById("game-container-done").style.display =
+                "none";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "none";
+              break;
+            case "game":
+              document.getElementById("start-game-session").style.display =
+                "none";
+              document.getElementById("game-container").style.display = "block";
+              document.getElementById("game-container-done").style.display =
+                "none";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "none";
+              renderCards();
+              break;
+            case "done":
+              document.getElementById("start-game-session").style.display =
+                "none";
+              document.getElementById("game-container").style.display = "none";
+              document.getElementById("game-container-done").style.display =
+                "block";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "none";
+              break;
+
+            case "submitted":
+              document.getElementById("start-game-session").style.display =
+                "none";
+              document.getElementById("game-container").style.display = "none";
+              document.getElementById("game-container-done").style.display =
+                "none";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "block";
+
+            default:
+              break;
+          }
+        }
+
+        /*************************************************************************************************
+         * Give me a token and I will update the local storage with the token. I already know the key
+         * **********************************************************************************************/
+        function updateGameToken(token) {
+          localStorage.setItem(
+            "wattamellon_token_player",
+            JSON.stringify(token)
+          );
+        }
+      </script>
+    </main>
   </body>
 </html>

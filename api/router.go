@@ -163,7 +163,7 @@ func CompleteGame(w http.ResponseWriter, r *http.Request){
 	}
 
 	query := `
-		UPDATE game set questions = ?, is_complete = true WHERE id = ?;
+		UPDATE games set questions = ?, is_complete = true WHERE id = ?;
 	`
 
 	result, err := RouterConfig.DB.Conn.Exec(query, game.Questions, game.ID)

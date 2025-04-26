@@ -1,361 +1,660 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script
+      defer=""
+      data-domain="shrood.app"
+      src="https://plausible.io/js/script.js"
+    ></script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create a Game</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=no"
+    />
+
+    <link rel="canonical" href="https://shrood.app/apps/wattamellon" />
+    <link rel="alternate" hreflang="en" href="https://shrood.app" />
+    <meta property="og:site_name" content="Shrood" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Wattamellon - How well do you know me?"
+    />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      name="twitter:title"
+      content="Wattamellon - How well do you know me?"
+    />
+    <meta property="og:article:author" content="Daniel Rangel" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@shrood" />
+    <meta name="twitter:creator" content="@yodarango" />
+    <meta
+      property="og:image"
+      content="/public/images/web_hosted_apps/wattamellon.webp"
+    />
+    <meta
+      name="keywords"
+      content="Wattamellon, friendship trivia game, who knows me best, social quiz app, funny friend quiz, viral quiz game, party game, friend group challenge, quiz about me, best friend test, fun with friends, get to know your friends, who knows you better, multiplayer quiz"
+    />
+
+    <meta
+      name="description"
+      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
+    />
+    <meta property="og:url" content="https://shrood.app/apps/wattamellon" />
+    <meta
+      property="og:description"
+      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
+    />
+    <meta
+      name="twitter:description"
+      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
+    />
+    <meta
+      name="twitter:image"
+      content="/public/images/web_hosted_apps/wattamellon.webp"
+    />
+
+    <link
+      rel="apple-touch-icon"
+      href="/public/images/web_hosted_apps/wattamellon.webp"
+    />
+    <link rel="manifest" href="/public/manifest.json" />
+    <link rel="manifest" href="/public/avatars.js" />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.danielrangel.net/fullds.min.css"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="/public/images/logo_round_pow_smalll.png"
+    />
+
+    <title>Shrood | Wattamellon - How well do you know me?</title>
     <style>
       #game-container,
       #game-container-done,
       #game-container-submitted {
         display: none;
       }
+
+      #create-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.6rem;
+
+            .thumbnail {
+                  width: 100%;
+                  max-width: 20rem;
+                  margin: auto;
+                  object-fit: contain;
+                  object-position: center;
+                  display: block;
+            }
+
+            input {
+                  width: 100%;
+                  border: 1px solid var(--dr-delta);
+                  border-radius: 2rem;
+                  padding: 1.6rem;
+                  display: block;
+            }
+
+            .btn-primary{
+                  background-color: var(--dr-delta);
+                  color: var(--dr-alpha);
+                  padding: 1.6rem 2rem;
+                  border-radius: 2rem;
+                  border: none;
+                  cursor: pointer;
+            }
+      }
+
+      #avatar-dialog {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+      }
+
+      .dialog-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+      }
+
+      .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+      }
+
+      .close-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+      }
+
+      .avatars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+      }
+
+      .avatar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+      }
+
+      .avatar-item:hover {
+            background-color: #f0f0f0;
+      }
+
+      .avatar-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+      }
+
+      .avatar-item p {
+            font-size: 0.8rem;
+            text-align: center;
+            margin: 0;
+      }
+
+      .load-more {
+            display: block;
+            margin: 1rem auto;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--dr-delta);
+            color: var(--dr-alpha);
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+      }
+
+      .selected-avatar {
+            background-color: #e0e0ff;
+      }
     </style>
+
     <script src="/public/categories_db.js"></script>
+    <script src="/public/avatars-data.js"></script>
+    <link       rel="stylesheet"
+      type="text/css" href="/public/app.css"></link>
   </head>
   <body>
-    <!-- This is the form to create a new game -->
-    <div id="create-form">
-      <h1>Create a Game</h1>
-      <input type="text" id="name" placeholder="Game Name" />
-      <input type="text" id="player_name" placeholder="Your Name" />
-      <!-- Not allowing users to pick size for now -->
-      <input type="hidden" id="size" value="50" />
-      <h3>Select Thumbnail</h3>
-      <div id="thumbnails">
-        <label>
-          <input type="radio" name="thumbnail" value="thumb1.png" /> Thumb 1
-        </label>
-        <label>
-          <input type="radio" name="thumbnail" value="thumb2.png" /> Thumb 2
-        </label>
+    <main>
+      <!-- This is the form to create a new game -->
+      <div id="create-form">
+        <h1>Create a Game</h1>
+        <img src="/public/images/welcome_4000.webp" class="thumbnail" />
+        <input type="text" id="name" placeholder="Game Name" />
+        <input type="text" id="player_name" placeholder="Your Name" />
+        <!-- Not allowing users to pick size for now -->
+        <input type="hidden" id="size" value="50" />
+        <h3>Select Avatar</h3>
+        <input type="hidden" id="selected_avatar" name="thumbnail" value="" />
+        <div id="selected_avatar_display">
+          <p>No avatar selected</p>
+        </div>
+        <button type="button" onclick="openAvatarDialog()" class="btn-primary">Select Avatar</button>
+        <button onclick="createGame()" class="btn-primary">Save Game</button>
+
+        <!-- Avatar Selection Dialog -->
+        <div id="avatar-dialog">
+          <div class="dialog-content">
+            <div class="dialog-header">
+              <h3>Select an Avatar</h3>
+              <button class="close-button" onclick="closeAvatarDialog()">×</button>
+            </div>
+            <div id="avatars-container" class="avatars-grid">
+              <!-- Avatars will be loaded here -->
+            </div>
+            <button id="load-more-btn" class="load-more" onclick="loadMoreAvatars()">Load More</button>
+          </div>
+        </div>
       </div>
-      <button onclick="createGame()">Save Game</button>
-    </div>
 
-    <!-- this is the game session -->
-    <div id="game-container"></div>
+      <!-- this is the game session -->
+      <div id="game-container"></div>
 
-    <!-- this is the finished game session -->
-    <div id="game-container-done">
-      <h2>Game Complete!</h2>
-      <button onclick="submitGame()">Submit Answers</button>
-    </div>
+      <!-- this is the finished game session -->
+      <div id="game-container-done">
+        <h2>Game Complete!</h2>
+        <button onclick="submitGame()">Submit Answers</button>
+      </div>
 
-    <!-- The game has been submitted. There is nothing else to see here  -->
-    <div id="game-container-submitted">
-      <h2>Game Submitted!</h2>
-      <button onclick="navigateToView()">See who has answered id</button>
-    </div>
-    <script>
-      /*************************************************************************************************
-       * Four screens are possible:
-       * 1. Create a game (default)
-       * 2. Play the game (the user ahs submitted the game information)
-       * 3. Game is done (the user has answered all the questions but not submitted)
-       * 4. Game is submitted (the user has submitted the game)
-       * *****************************************************************************/
-      document.addEventListener("DOMContentLoaded", () => {
-        const gameToken = getGameTokenFromLocalStorage();
-        if (gameToken.game_id) {
-          if (gameToken.is_submitted) {
-            renderView("submitted");
-            return;
+      <!-- The game has been submitted. There is nothing else to see here  -->
+      <div id="game-container-submitted">
+        <h2>Game Submitted!</h2>
+        <button onclick="navigateToView()">See who has answered id</button>
+      </div>
+      <script>
+        // Avatar selection variables
+        let currentAvatarIndex = 0;
+        const avatarsPerPage = 10;
+        let selectedAvatar = null;
+
+        // Avatar dialog functions
+        function openAvatarDialog() {
+          document.getElementById('avatar-dialog').style.display = 'block';
+
+          // Load initial avatars if not already loaded
+          if (document.getElementById('avatars-container').children.length === 0) {
+            loadMoreAvatars();
+          }
+        }
+
+        function closeAvatarDialog() {
+          document.getElementById('avatar-dialog').style.display = 'none';
+        }
+
+        function loadMoreAvatars() {
+          const container = document.getElementById('avatars-container');
+          const loadMoreBtn = document.getElementById('load-more-btn');
+
+          // Calculate end index for this batch
+          const endIndex = Math.min(currentAvatarIndex + avatarsPerPage, avatarsData.length);
+
+          // Load avatars for this batch
+          for (let i = currentAvatarIndex; i < endIndex; i++) {
+            const avatar = avatarsData[i];
+            const avatarElement = document.createElement('div');
+            avatarElement.className = 'avatar-item';
+            avatarElement.dataset.file = avatar.file;
+
+            // Add selected class if this is the currently selected avatar
+            if (selectedAvatar === avatar.file) {
+              avatarElement.classList.add('selected-avatar');
+            }
+
+            avatarElement.innerHTML = `
+              <img src="/public/images/avatars/${avatar.file}" alt="${avatar.name}">
+              <p>${avatar.name}</p>
+            `;
+
+            avatarElement.addEventListener('click', function() {
+              selectAvatar(avatar.file, avatar.name);
+            });
+
+            container.appendChild(avatarElement);
           }
 
-          if (gameToken.is_complete) {
-            renderView("done");
-            return;
+          // Update current index
+          currentAvatarIndex = endIndex;
+
+          // Hide load more button if all avatars are loaded
+          if (currentAvatarIndex >= avatarsData.length) {
+            loadMoreBtn.style.display = 'none';
           }
-
-          renderView("game");
-        } else {
-          renderView("create");
         }
-      });
 
-      /*************************************************************************************************
-       * Get and return the game token from the local storage
-       * **********************************************************************************************/
-      function getGameTokenFromLocalStorage() {
-        let gameToken = localStorage.getItem("wattamellon_token");
-        gameToken = JSON.parse(gameToken || "{}");
-        return gameToken;
-      }
+        function selectAvatar(file, name) {
+          // Update selected avatar
+          selectedAvatar = file;
 
-      /*************************************************************************************************
-       * Give me an array and I will return a random selection of 2 options
-       * **********************************************************************************************/
-      function getRandomOptions(options) {
-        const keys = Object.keys(options);
-        shuffleArray(keys);
-        return keys
-          .slice(0, 2)
-          .map((key) => ({ id: key, value: options[key] }));
-      }
+          // Update hidden input value
+          document.getElementById('selected_avatar').value = file;
 
-      /*************************************************************************************************
-       * Give me an array and I will shuffle it. I will NOT return anything. I modify the original
-       * **********************************************************************************************/
-      function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
+          // Update display
+          document.getElementById('selected_avatar_display').innerHTML = `
+            <img src="/public/images/avatars/${file}" alt="${name}" style="width: 100px; height: 100px; object-fit: contain;">
+            <p>${name}</p>
+          `;
+
+          // Update selected class in dialog
+          const avatarItems = document.querySelectorAll('.avatar-item');
+          avatarItems.forEach(item => {
+            if (item.dataset.file === file) {
+              item.classList.add('selected-avatar');
+            } else {
+              item.classList.remove('selected-avatar');
+            }
+          });
+
+          // Close dialog
+          closeAvatarDialog();
         }
-      }
 
-      /*************************************************************************************************
-       * Navigate to the view page
-       * **********************************************************************************************/
-      function navigateToView() {
-        const { game_id, creatorToken } = getGameTokenFromLocalStorage();
-        window.location.href = "/view/" + game_id;
-      }
+        /*************************************************************************************************
+         * Four screens are possible:
+         * 1. Create a game (default)
+         * 2. Play the game (the user ahs submitted the game information)
+         * 3. Game is done (the user has answered all the questions but not submitted)
+         * 4. Game is submitted (the user has submitted the game)
+         * *****************************************************************************/
+        document.addEventListener("DOMContentLoaded", () => {
+          const gameToken = getGameTokenFromLocalStorage();
+          if (gameToken.game_id) {
+            if (gameToken.is_submitted) {
+              renderView("submitted");
+              return;
+            }
 
-      /*************************************************************************************************
-       * This means that the user has answered all the questions and is ready to submit the game. If
-       * there are any emtpy fields the user will be alerted.
-       * **********************************************************************************************/
-      async function createGame() {
-        // Generates a random token for the game
-        function generateToken() {
-          let token = "";
-          const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-          for (let i = 0; i < 25; i++) {
-            token += chars.charAt(Math.floor(Math.random() * chars.length));
+            if (gameToken.is_complete) {
+              renderView("done");
+              return;
+            }
+
+            renderView("game");
+          } else {
+            renderView("create");
           }
-          return token;
-        }
-
-        // gets the current values set in the form to createa a game
-        function getFormValues() {
-          const thumbnail = document.querySelector(
-            'input[name="thumbnail"]:checked'
-          )?.value;
-          const name = document.getElementById("name").value;
-          const playerName = document.getElementById("player_name").value;
-          const size = 10; //DEV UNCOMMENT document.getElementById("size").value;
-
-          return { thumbnail, playerName, size, name };
-        }
-
-        const { name, playerName, size, thumbnail } = getFormValues();
-        const creatorToken = generateToken();
-
-        // alert the user if they have not selected a thumbnail or have not entered a name
-        if (!thumbnail) {
-          alert("Please select a thumbnail");
-          return;
-        }
-        if (!name) {
-          alert("Please enter a name for this game");
-          return;
-        }
-        if (!playerName) {
-          alert("Please enter your name");
-          return;
-        }
-
-        const gameToken = getGameTokenFromLocalStorage();
-        const categorieKeys = Object.keys(categories).splice(0, size);
-        // shuffle the categories so that the questions are not in the same order
-        shuffleArray(categorieKeys);
-
-        const emtpyQuestions = categorieKeys.reduce((acc, key) => {
-          acc[key] = "";
-          return acc;
-        }, {});
-
-        const res = await fetch("/new-game", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            creator_token: creatorToken,
-            player_name: playerName,
-            size: Number(size),
-            questions: "{}",
-            thumbnail,
-            name,
-          }),
         });
 
-        const { data, success } = await res.json();
+        /*************************************************************************************************
+         * Get and return the game token from the local storage
+         * **********************************************************************************************/
+        function getGameTokenFromLocalStorage() {
+          let gameToken = localStorage.getItem("wattamellon_token");
+          gameToken = JSON.parse(gameToken || "{}");
+          return gameToken;
+        }
 
-        if (success) {
-          // update the game token with the order of the questions
-          if (!(Object.keys(gameToken.questions || {}) > 0)) {
-            updateGameToken({
-              creator_token: data.creator_token,
-              questions: emtpyQuestions,
-              thumbnail: data.thumbnail,
-              created: data.created,
-              is_complete: false,
-              is_submitted: false,
-              game_id: data.id,
-              current_index: 0,
-              size: data.size,
-              name: data.name,
+        /*************************************************************************************************
+         * Give me an array and I will return a random selection of 2 options
+         * **********************************************************************************************/
+        function getRandomOptions(options) {
+          const keys = Object.keys(options);
+          shuffleArray(keys);
+          return keys
+            .slice(0, 2)
+            .map((key) => ({ id: key, value: options[key] }));
+        }
+
+        /*************************************************************************************************
+         * Give me an array and I will shuffle it. I will NOT return anything. I modify the original
+         * **********************************************************************************************/
+        function shuffleArray(array) {
+          for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+          }
+        }
+
+        /*************************************************************************************************
+         * Navigate to the view page
+         * **********************************************************************************************/
+        function navigateToView() {
+          const { game_id, creatorToken } = getGameTokenFromLocalStorage();
+          window.location.href = "/view/" + game_id;
+        }
+
+        /*************************************************************************************************
+         * This means that the user has answered all the questions and is ready to submit the game. If
+         * there are any emtpy fields the user will be alerted.
+         * **********************************************************************************************/
+        async function createGame() {
+          // Generates a random token for the game
+          function generateToken() {
+            let token = "";
+            const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+            for (let i = 0; i < 25; i++) {
+              token += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return token;
+          }
+
+          // gets the current values set in the form to create a game
+          function getFormValues() {
+            const thumbnail = document.getElementById("selected_avatar").value;
+            const name = document.getElementById("name").value;
+            const playerName = document.getElementById("player_name").value;
+            const size = 10; //DEV UNCOMMENT document.getElementById("size").value;
+
+            return { thumbnail, playerName, size, name };
+          }
+
+          const { name, playerName, size, thumbnail } = getFormValues();
+          const creatorToken = generateToken();
+
+          // alert the user if they have not selected a thumbnail or have not entered a name
+          if (!thumbnail) {
+            alert("Please select a thumbnail");
+            return;
+          }
+          if (!name) {
+            alert("Please enter a name for this game");
+            return;
+          }
+          if (!playerName) {
+            alert("Please enter your name");
+            return;
+          }
+
+          const gameToken = getGameTokenFromLocalStorage();
+          const categorieKeys = Object.keys(categories).splice(0, size);
+          // shuffle the categories so that the questions are not in the same order
+          shuffleArray(categorieKeys);
+
+          const emtpyQuestions = categorieKeys.reduce((acc, key) => {
+            acc[key] = "";
+            return acc;
+          }, {});
+
+          const res = await fetch("/new-game", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              creator_token: creatorToken,
+              player_name: playerName,
+              size: Number(size),
+              questions: "{}",
+              thumbnail,
+              name,
+            }),
+          });
+
+          const { data, success } = await res.json();
+
+          if (success) {
+            // update the game token with the order of the questions
+            if (!(Object.keys(gameToken.questions || {}) > 0)) {
+              updateGameToken({
+                creator_token: data.creator_token,
+                questions: emtpyQuestions,
+                thumbnail: data.thumbnail,
+                created: data.created,
+                is_complete: false,
+                is_submitted: false,
+                game_id: data.id,
+                current_index: 0,
+                size: data.size,
+                name: data.name,
+              });
+            }
+            renderView("game");
+          } else {
+            alert("Error creating game: " + data.error);
+          }
+        }
+
+        /*************************************************************************************************
+         * I am responsible for three things:
+         * 1. Rendering the cards on the initial load
+         * 2. Rendering the next cards when the user selects one option
+         * 3. Updating the game token with the current game state
+         * **********************************************************************************************/
+        function renderCards() {
+          // get the game token from the local storage, so the state is preserved
+          const gameToken = getGameTokenFromLocalStorage();
+          const categorieKeys = Object.keys(gameToken.questions);
+
+          // also get the current index of the game so we know which question to show
+          let currentIndex = gameToken.current_index;
+
+          // I need to append to this container the current question and the options
+          const container = document.getElementById("game-container");
+
+          function showNextQuestion() {
+            if (currentIndex >= categorieKeys.length) {
+              renderView("done");
+              return;
+            }
+
+            // based on the current index, get the current category key
+            const categoryKey = categorieKeys[currentIndex];
+
+            // based on the current category key, get the question and the random options
+            const { question, options } = categories[categoryKey];
+            const selectedOptions = getRandomOptions(options);
+
+            container.innerHTML = "";
+            const h4 = document.createElement("h4");
+            h4.textContent = `Question ${currentIndex + 1} of ${
+              categorieKeys.length
+            }`;
+            container.appendChild(h4);
+
+            const h3 = document.createElement("h3");
+            h3.textContent = question;
+            container.appendChild(h3);
+
+            // when the user clicks on the card, we need to update the game token with the selected option but also with the two options given to them so that the player can see the same options they had
+            selectedOptions.forEach((option) => {
+              const card = document.createElement("div");
+              card.className = "card";
+              card.textContent = option.value;
+              card.onclick = () => {
+                currentIndex++;
+                gameToken.questions[categoryKey] = {
+                  selection: option.id,
+                  options: [...selectedOptions],
+                };
+                gameToken.current_index = currentIndex;
+                gameToken.is_complete = currentIndex >= categorieKeys.length;
+                updateGameToken(gameToken);
+                showNextQuestion();
+              };
+              container.appendChild(card);
             });
           }
-          renderView("game");
-        } else {
-          alert("Error creating game: " + data.error);
+
+          // call the function on initial load
+          showNextQuestion();
         }
-      }
 
-      /*************************************************************************************************
-       * I am responsible for three things:
-       * 1. Rendering the cards on the initial load
-       * 2. Rendering the next cards when the user selects one option
-       * 3. Updating the game token with the current game state
-       * **********************************************************************************************/
-      function renderCards() {
-        // get the game token from the local storage, so the state is preserved
-        const gameToken = getGameTokenFromLocalStorage();
-        const categorieKeys = Object.keys(gameToken.questions);
+        /*************************************************************************************************
+         * This function is responsible for submitting the game. It will send the answers to the server
+         * and if successful, it will alert the user and redirect them to the view page
+         * **********************************************************************************************/
+        async function submitGame() {
+          // check that the user has answered all the questions
 
-        // also get the current index of the game so we know which question to show
-        let currentIndex = gameToken.current_index;
+          const gameToken = getGameTokenFromLocalStorage();
+          const { creator_token, game_id, questions, is_complete } = gameToken;
 
-        // I need to append to this container the current question and the options
-        const container = document.getElementById("game-container");
-
-        function showNextQuestion() {
-          if (currentIndex >= categorieKeys.length) {
-            renderView("done");
+          if (!is_complete) {
+            alert("Please answer all the questions before submitting");
             return;
           }
-
-          // based on the current index, get the current category key
-          const categoryKey = categorieKeys[currentIndex];
-
-          // based on the current category key, get the question and the random options
-          const { question, options } = categories[categoryKey];
-          const selectedOptions = getRandomOptions(options);
-
-          container.innerHTML = "";
-          const h4 = document.createElement("h4");
-          h4.textContent = `Question ${currentIndex + 1} of ${
-            categorieKeys.length
-          }`;
-          container.appendChild(h4);
-
-          const h3 = document.createElement("h3");
-          h3.textContent = question;
-          container.appendChild(h3);
-
-          // when the user clicks on the card, we need to update the game token with the selected option but also with the two options given to them so that the player can see the same options they had
-          selectedOptions.forEach((option) => {
-            const card = document.createElement("div");
-            card.className = "card";
-            card.textContent = option.value;
-            card.onclick = () => {
-              currentIndex++;
-              gameToken.questions[categoryKey] = {
-                selection: option.id,
-                options: [...selectedOptions],
-              };
-              gameToken.current_index = currentIndex;
-              gameToken.is_complete = currentIndex >= categorieKeys.length;
-              updateGameToken(gameToken);
-              showNextQuestion();
-            };
-            container.appendChild(card);
+          const res = await fetch("/complete-game", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: game_id,
+              creator_token,
+              questions: JSON.stringify(questions),
+              is_completed: true,
+            }),
           });
+
+          const data = await res.json();
+          if (data.success) {
+            gameToken.is_submitted = true;
+            updateGameToken(gameToken);
+
+            alert("Game submitted! You can now view the results.");
+            renderView("submitted");
+            //     window.location.href = "/view/" + game_id;
+          } else {
+            alert("Error submitting game.");
+          }
         }
 
-        // call the function on initial load
-        showNextQuestion();
-      }
+        /*************************************************************************************************
+         * It will hide and show the right elements based on the view that is passed in
+         * **********************************************************************************************/
+        function renderView(view) {
+          switch (view) {
+            case "create":
+              document.getElementById("create-form").style.display = "flex";
+              document.getElementById("game-container").style.display = "none";
+              document.getElementById("game-container-done").style.display =
+                "none";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "none";
+              break;
+            case "game":
+              document.getElementById("create-form").style.display = "none";
+              document.getElementById("game-container").style.display = "block";
+              document.getElementById("game-container-done").style.display =
+                "none";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "none";
+              renderCards();
+              break;
+            case "done":
+              document.getElementById("create-form").style.display = "none";
+              document.getElementById("game-container").style.display = "none";
+              document.getElementById("game-container-done").style.display =
+                "block";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "none";
+              break;
 
-      /*************************************************************************************************
-       * This function is responsible for submitting the game. It will send the answers to the server
-       * and if successful, it will alert the user and redirect them to the view page
-       * **********************************************************************************************/
-      async function submitGame() {
-        // check that the user has answered all the questions
+            case "submitted":
+              document.getElementById("create-form").style.display = "none";
+              document.getElementById("game-container").style.display = "none";
+              document.getElementById("game-container-done").style.display =
+                "none";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "block";
 
-        const gameToken = getGameTokenFromLocalStorage();
-        const { creator_token, game_id, questions, is_complete } = gameToken;
-
-        if (!is_complete) {
-          alert("Please answer all the questions before submitting");
-          return;
+            default:
+              break;
+          }
         }
-        const res = await fetch("/complete-game", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: game_id,
-            creator_token,
-            questions: JSON.stringify(questions),
-            is_completed: true,
-          }),
-        });
 
-        const data = await res.json();
-        if (data.success) {
-          gameToken.is_submitted = true;
-          updateGameToken(gameToken);
-
-          alert("Game submitted! You can now view the results.");
-          renderView("submitted");
-          //     window.location.href = "/view/" + game_id;
-        } else {
-          alert("Error submitting game.");
+        /*************************************************************************************************
+         * Give me a token and I will update the local storage with the token. I already know the key
+         * **********************************************************************************************/
+        function updateGameToken(token) {
+          localStorage.setItem("wattamellon_token", JSON.stringify(token));
         }
-      }
-
-      /*************************************************************************************************
-       * It will hide and show the right elements based on the view that is passed in
-       * **********************************************************************************************/
-      function renderView(view) {
-        switch (view) {
-          case "create":
-            document.getElementById("create-form").style.display = "block";
-            document.getElementById("game-container").style.display = "none";
-            document.getElementById("game-container-done").style.display =
-              "none";
-            document.getElementById("game-container-submitted").style.display =
-              "none";
-            break;
-          case "game":
-            document.getElementById("create-form").style.display = "none";
-            document.getElementById("game-container").style.display = "block";
-            document.getElementById("game-container-done").style.display =
-              "none";
-            document.getElementById("game-container-submitted").style.display =
-              "none";
-            renderCards();
-            break;
-          case "done":
-            document.getElementById("create-form").style.display = "none";
-            document.getElementById("game-container").style.display = "none";
-            document.getElementById("game-container-done").style.display =
-              "block";
-            document.getElementById("game-container-submitted").style.display =
-              "none";
-            break;
-
-          case "submitted":
-            document.getElementById("create-form").style.display = "none";
-            document.getElementById("game-container").style.display = "none";
-            document.getElementById("game-container-done").style.display =
-              "none";
-            document.getElementById("game-container-submitted").style.display =
-              "block";
-
-          default:
-            break;
-        }
-      }
-
-      /*************************************************************************************************
-       * Give me a token and I will update the local storage with the token. I already know the key
-       * **********************************************************************************************/
-      function updateGameToken(token) {
-        localStorage.setItem("wattamellon_token", JSON.stringify(token));
-      }
-    </script>
+      </script>
+    </main>
   </body>
 </html>

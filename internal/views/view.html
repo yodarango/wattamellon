@@ -1,73 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script
+      defer=""
+      data-domain="shrood.app"
+      src="https://plausible.io/js/script.js"
+    ></script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Game View</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=no"
+    />
+
+    <link rel="canonical" href="https://shrood.app/apps/wattamellon" />
+    <link rel="alternate" hreflang="en" href="https://shrood.app" />
+    <meta property="og:site_name" content="Shrood" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Wattamellon - How well do you know me?"
+    />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      name="twitter:title"
+      content="Wattamellon - How well do you know me?"
+    />
+    <meta property="og:article:author" content="Daniel Rangel" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@shrood" />
+    <meta name="twitter:creator" content="@yodarango" />
+    <meta
+      property="og:image"
+      content="/public/images/web_hosted_apps/wattamellon.webp"
+    />
+    <meta
+      name="keywords"
+      content="Wattamellon, friendship trivia game, who knows me best, social quiz app, funny friend quiz, viral quiz game, party game, friend group challenge, quiz about me, best friend test, fun with friends, get to know your friends, who knows you better, multiplayer quiz"
+    />
+
+    <meta
+      name="description"
+      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
+    />
+    <meta property="og:url" content="https://shrood.app/apps/wattamellon" />
+    <meta
+      property="og:description"
+      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
+    />
+    <meta
+      name="twitter:description"
+      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
+    />
+    <meta
+      name="twitter:image"
+      content="/public/images/web_hosted_apps/wattamellon.webp"
+    />
+
+    <link
+      rel="apple-touch-icon"
+      href="/public/images/web_hosted_apps/wattamellon.webp"
+    />
+    <link rel="manifest" href="/public/manifest.json" />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.danielrangel.net/fullds.min.css"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="/public/images/logo_round_pow_smalll.png"
+    />
+
+    <title>
+      Shrood | Wattamellon - {{.Game.Name}} How well do you know me?
+    </title>
+    <style>
+      #game-container,
+      #game-container-done,
+      #game-container-submitted {
+        display: none;
+      }
+    </style>
+
     <script src="/public/categories_db.js"></script>
+    <link href="/public/app.css" rel="stylesheet"
+      type="text/css"></link>
     <script>
       // set the answers of this user
       const yourAnswers = {{.Game.Questions}};
     </script>
   </head>
   <body>
-    <h1>Game sessions for {{.Game.Name}}</h1>
-    <img src="{{.Game.Thumbnail}}" alt="{{.Game.Name}}" />
-    <p>Share this link with your friends:</p>
-    <input type="text" value="" id="gameLink" readonly />
-    <button onclick="copyLink()">Copy Link</button>
+    <main>
+      <h1>Game sessions for {{.Game.Name}}</h1>
+      <img src="{{.Game.Thumbnail}}" alt="{{.Game.Name}}" />
+      <p>Share this link with your friends:</p>
+      <input type="text" value="" id="gameLink" readonly />
+      <button onclick="copyLink()">Copy Link</button>
 
-    <!-- dummy div for varaible data storage since it is much easier to parse with JS -->
+      <!-- dummy div for varaible data storage since it is much easier to parse with JS -->
 
-    <div id="sessions">
-      {{if .Sessions}}
-      <h2>Players</h2>
-      {{range .Sessions}}
-      <h4>Player: {{.PlayerName}}</h4>
-      <h5>Score: {{.SuccessRate}}%</h5>
-      <div id="player-results-{{.ID}}">
-        <div class="results-display"></div>
+      <div id="sessions">
+        {{if .Sessions}}
+        <h2>Players</h2>
+        {{range .Sessions}}
+        <h4>Player: {{.PlayerName}}</h4>
+        <h5>Score: {{.SuccessRate}}%</h5>
+        <div id="player-results-{{.ID}}">
+          <div class="results-display"></div>
+        </div>
+        <script>
+          Object.keys(yourAnswers).forEach((key) => {
+            const question = categories[key]["question"];
+            const yourSelection =
+              categories[key]["options"][yourAnswers[key].selection];
+          const playerAnswer = categories[key]["options"][{{.Answers}}[key]?.selection];
+
+          const resultsDisplay = document.querySelector(
+            `#player-results-{{.ID}} .results-display`
+          );
+
+          resultsDisplay.innerHTML += `
+            <div class="question ${ {{.Answers}}[key]?.isCorrect ? "answer-correct" : "answer-incorrect" }">
+              <b>${question}</b>
+              <p>Your answer: ${yourSelection || "None"}</p>
+              <p>Player's answer: ${playerAnswer || "None"}</p>
+            </div>
+          `;
+          });
+        </script>
+        {{end}} {{else}}
+        <p>No players have played this game yet.</p>
+        {{end}}
       </div>
+      <button onclick="deleteGame()">Delete Game</button>
+
       <script>
-        Object.keys(yourAnswers).forEach((key) => {
-          const question = categories[key]["question"];
-          const yourSelection =
-            categories[key]["options"][yourAnswers[key].selection];
-        const playerAnswer = categories[key]["options"][{{.Answers}}[key]?.selection];
+        const gameId = window.location.pathname.split("/").pop();
 
-        const resultsDisplay = document.querySelector(
-          `#player-results-{{.ID}} .results-display`
-        );
+        function copyLink() {
+          navigator.clipboard.writeText(
+            window.location.origin + "/play/" + gameId
+          );
+          alert("Link copied!");
+        }
 
-        resultsDisplay.innerHTML += `
-          <div class="question ${ {{.Answers}}[key]?.isCorrect ? "answer-correct" : "answer-incorrect" }">
-            <b>${question}</b>
-            <p>Your answer: ${yourSelection || "None"}</p>
-            <p>Player's answer: ${playerAnswer || "None"}</p>
-          </div>
-        `;
-        });
+        function deleteGame() {
+          localStorage.removeItem("wattamellon_token");
+          window.location.href = "/";
+        }
       </script>
-      {{end}} {{else}}
-      <p>No players have played this game yet.</p>
-      {{end}}
-    </div>
-    <button onclick="deleteGame()">Delete Game</button>
-
-    <script>
-      const gameId = window.location.pathname.split("/").pop();
-
-      function copyLink() {
-        navigator.clipboard.writeText(
-          window.location.origin + "/play/" + gameId
-        );
-        alert("Link copied!");
-      }
-
-      function deleteGame() {
-        localStorage.removeItem("wattamellon_token");
-        window.location.href = "/";
-      }
-    </script>
+    </main>
   </body>
 </html>
