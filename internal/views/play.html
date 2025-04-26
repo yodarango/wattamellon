@@ -241,27 +241,51 @@
         text-align: center;
       }
 
-      .score-details {
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-        margin-top: 1rem;
-      }
-
-      .score-item {
+      /* Pie chart styles */
+      .pie-chart-container {
         display: flex;
         flex-direction: column;
         align-items: center;
+        margin-top: 1.5rem;
       }
 
-      .score-number {
-        font-size: 2rem;
-        font-weight: bold;
+      .pie-chart {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin-bottom: 1rem;
       }
 
-      .score-label {
+      .pie-chart-legend {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 0.5rem;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .legend-color {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+      }
+
+      .correct-color {
+        background-color: #4CAF50;
+      }
+
+      .incorrect-color {
+        background-color: #FF5252;
+      }
+
+      .legend-label {
         font-size: 0.9rem;
-        opacity: 0.7;
       }
 
       /* Accordion styles */
@@ -659,51 +683,87 @@
 
           // Calculate score percentage for display
           const scorePercentage = Math.round(success_rate);
+          const totalQuestions = correct_answers + incorrect_answers;
+          const correctAngle = (correct_answers / totalQuestions) * 360;
 
-          resultsContainer.innerHTML = `
-          <div class="score-summary">
+          // Create the score summary with pie chart
+          const scoreSummary = document.createElement('div');
+          scoreSummary.className = 'score-summary';
+          scoreSummary.innerHTML = `
             <h3>Your Score: ${scorePercentage}%</h3>
-            <div class="score-details">
-              <div class="score-item">
-                <span class="score-number">${correct_answers}</span>
-                <span class="score-label">Correct</span>
-              </div>
-              <div class="score-item">
-                <span class="score-number">${incorrect_answers}</span>
-                <span class="score-label">Incorrect</span>
+            <div class="pie-chart-container">
+              <div class="pie-chart" style="background-image: conic-gradient(
+                #4CAF50 0deg ${correctAngle}deg,
+                #FF5252 ${correctAngle}deg 360deg
+              )"></div>
+              <div class="pie-chart-legend">
+                <div class="legend-item">
+                  <span class="legend-color correct-color"></span>
+                  <span class="legend-label">Correct: ${correct_answers}</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color incorrect-color"></span>
+                  <span class="legend-label">Incorrect: ${incorrect_answers}</span>
+                </div>
               </div>
             </div>
-          </div>
+          `;
 
-          <h3>Answer Breakdown:</h3>
-          <div class="accordion-container">
-            ${Object.keys(answers)
-              .map((key, index) => {
-                const question = categories[key].question;
-                const selectedOption =
-                  categories[key]["options"][answers[key].selection];
-                const creatorSelectOption =
-                  categories[key]["options"][gameQuestionsParsed[key].selection];
-                const isCorrect = answers[key].isCorrect;
-                return `
-                <div class="accordion-item ${isCorrect ? "correct" : "incorrect"}">
-                  <div class="accordion-header" onclick="toggleAccordion(${index})">
-                    <p>${question}</p>
-                    <div class="accordion-icon">
-                      <span class="accordion-plus">+</span>
-                      <span class="accordion-minus">−</span>
-                    </div>
-                  </div>
-                  <div class="accordion-content">
-                    <p><strong>Your answer:</strong> ${selectedOption}</p>
-                    <p><strong>${isCorrect ? "Correct!" : "Correct answer was:"}</strong> ${creatorSelectOption}</p>
-                  </div>
-                </div>
-              `;
-              })
-              .join("")}
-          </div>
-        `;
+          // Create the answer breakdown title
+          const breakdownTitle = document.createElement('h3');
+          breakdownTitle.textContent = 'Answer Breakdown:';
+
+          // Create the accordion container
+          const accordionContainer = document.createElement('div');
+          accordionContainer.className = 'accordion-container';
+
+          // Clear the results container and add the new elements
+          resultsContainer.innerHTML = '';
+          resultsContainer.appendChild(scoreSummary);
+          resultsContainer.appendChild(breakdownTitle);
+          resultsContainer.appendChild(accordionContainer);
+
+          // Add each question as an accordion item
+          Object.keys(answers).forEach((key, index) => {
+            const question = categories[key].question;
+            const selectedOption = categories[key]["options"][answers[key].selection];
+            const creatorSelectOption = categories[key]["options"][gameQuestionsParsed[key].selection];
+            const isCorrect = answers[key].isCorrect;
+
+            const accordionItem = document.createElement('div');
+            accordionItem.className = `accordion-item ${isCorrect ? "correct" : "incorrect"}`;
+
+            const accordionHeader = document.createElement('div');
+            accordionHeader.className = 'accordion-header';
+            accordionHeader.onclick = function() { toggleAccordion(index); };
+
+            const questionText = document.createElement('p');
+            questionText.textContent = question;
+
+            const accordionIcon = document.createElement('div');
+            accordionIcon.className = 'accordion-icon';
+            accordionIcon.innerHTML = '<span class="accordion-plus">+</span><span class="accordion-minus">−</span>';
+
+            accordionHeader.appendChild(questionText);
+            accordionHeader.appendChild(accordionIcon);
+
+            const accordionContent = document.createElement('div');
+            accordionContent.className = 'accordion-content';
+
+            const yourAnswer = document.createElement('p');
+            yourAnswer.innerHTML = `<strong>Your answer:</strong> ${selectedOption}`;
+
+            const correctAnswer = document.createElement('p');
+            correctAnswer.innerHTML = `<strong>${isCorrect ? "Correct!" : "Correct answer was:"}</strong> ${creatorSelectOption}`;
+
+            accordionContent.appendChild(yourAnswer);
+            accordionContent.appendChild(correctAnswer);
+
+            accordionItem.appendChild(accordionHeader);
+            accordionItem.appendChild(accordionContent);
+
+            accordionContainer.appendChild(accordionItem);
+          });
 
           // Add the toggle function for the accordion
           window.toggleAccordion = function(index) {
