@@ -84,6 +84,91 @@
       #game-container-submitted {
         display: none;
       }
+
+      .btn-primary {
+        background-color: var(--dr-delta);
+        color: var(--dr-alpha);
+        padding: 1.6rem 2rem;
+        border-radius: 2rem;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      /* Accordion styles */
+      .accordion-container {
+        width: 100%;
+      }
+
+      .accordion-item {
+        margin-bottom: 1rem;
+        border-radius: 1rem;
+      }
+
+      .accordion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border-radius: 1rem;
+      }
+
+      .accordion-icon {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .accordion-plus {
+        display: inline-block;
+      }
+
+      .accordion-minus {
+        display: none;
+      }
+
+      .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease;
+        padding: 0 1.5rem;
+
+        p{
+            text-align: left;
+        }
+      }
+
+      .accordion-item.active .accordion-content {
+        padding-bottom: 1rem;
+        max-height: 20rem;
+      }
+
+      .accordion-item.active .accordion-plus {
+        display: none;
+      }
+
+      .accordion-item.active .accordion-minus {
+        display: inline-block;
+      }
+
+      .accordion-item.correct {
+        background-color: rgba(0, 200, 0, 0.1);
+        border: 1px solid rgba(0, 200, 0, 0.3);
+      }
+
+      .accordion-item.incorrect {
+        background-color: rgba(255, 0, 0, 0.1);
+        border: 1px solid rgba(255, 0, 0, 0.3);
+      }
+      .accordion-item.average {
+        background-color: rgba(255, 255, 0, 0.1);
+        border: 1px solid rgba(255, 255, 0, 0.3);
+      }
+      .accordion-item.none {
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
     </style>
 
     <script src="/public/categories_db.js"></script>
@@ -96,44 +181,59 @@
   </head>
   <body>
     <main>
-      <h1>Game sessions for {{.Game.Name}}</h1>
-      <img src="{{.Game.Thumbnail}}" alt="{{.Game.Name}}" />
-      <p>Share this link with your friends:</p>
-      <input type="text" value="" id="gameLink" readonly />
-      <button onclick="copyLink()">Copy Link</button>
+      <section class="mb-4">
+            <h1>Game sessions for {{.Game.Name}}</h1>
+            <img src="/public/images/avatars/{{.Game.Thumbnail}}" alt="{{.Game.Name}}" />
+            <input type="text" value="" id="gameLink" readonly class="d-none" />
+            <button onclick="copyLink()" class="btn-primary w-100">Share Game Link</button>
+      </section>
 
       <!-- dummy div for varaible data storage since it is much easier to parse with JS -->
 
       <div id="sessions">
         {{if .Sessions}}
-        <h2>Players</h2>
+        <h3 class="mb-4">Players</h3>
+        <div class="accordion-container">
         {{range .Sessions}}
-        <h4>Player: {{.PlayerName}}</h4>
-        <h5>Score: {{.SuccessRate}}%</h5>
-        <div id="player-results-{{.ID}}">
-          <div class="results-display"></div>
-        </div>
-        <script>
-          Object.keys(yourAnswers).forEach((key) => {
-            const question = categories[key]["question"];
-            const yourSelection =
-              categories[key]["options"][yourAnswers[key].selection];
-          const playerAnswer = categories[key]["options"][{{.Answers}}[key]?.selection];
-
-          const resultsDisplay = document.querySelector(
-            `#player-results-{{.ID}} .results-display`
-          );
-
-          resultsDisplay.innerHTML += `
-            <div class="question ${ {{.Answers}}[key]?.isCorrect ? "answer-correct" : "answer-incorrect" }">
-              <b>${question}</b>
-              <p>Your answer: ${yourSelection || "None"}</p>
-              <p>Player's answer: ${playerAnswer || "None"}</p>
+        <div class="accordion-item {{if gt .SuccessRate 100}}none{{else if ge .SuccessRate 81}}correct{{else if ge .SuccessRate 51}}average{{else}}incorrect{{end}}" role="button" onclick="toggleAccordion(this)">
+            <div class="accordion-header">
+                  <div>
+                        <h4>Player: {{.PlayerName}}</h4>
+                        <h5>Score: {{.SuccessRate}}%</h5>
+                  </div>
+                  <div class="accordion-icon">
+                        <span class="accordion-plus">+</span><span class="accordion-minus">−</span></div>
             </div>
-          `;
-          });
-        </script>
-        {{end}} {{else}}
+            <div class="accordion-content">
+                  <div id="player-results-{{.ID}}">
+                  <div class="results-display"></div>
+                  </div>
+                  <script>
+                  Object.keys(yourAnswers).forEach((key) => {
+                        const question = categories[key]["question"];
+                        const yourSelection =
+                        categories[key]["options"][yourAnswers[key].selection];
+                  const playerAnswer = categories[key]["options"][{{.Answers}}[key]?.selection];
+
+                  const resultsDisplay = document.querySelector(
+                        `#player-results-{{.ID}} .results-display`
+                  );
+
+                  resultsDisplay.innerHTML += `
+                        <div class="question ${ {{.Answers}}[key]?.isCorrect ? "answer-correct" : "answer-incorrect" }">
+                        <b>${question}</b>
+                        <p>Your answer: ${yourSelection || "None"}</p>
+                        <p>Their answer: ${playerAnswer || "None"}</p>
+                        </div>
+                  `;
+                  });
+                  </script>
+            </div>
+        </div>
+        {{end}}
+        </div>
+
+        {{else}}
         <p>No players have played this game yet.</p>
         {{end}}
       </div>
@@ -155,5 +255,10 @@
         }
       </script>
     </main>
+    <script>
+      function toggleAccordion(element) {
+            element.classList.toggle("active");
+      }
+    </script>
   </body>
 </html>
