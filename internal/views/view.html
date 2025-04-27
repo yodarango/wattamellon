@@ -169,6 +169,60 @@
         background-color: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.3);
       }
+
+      /* nested accordion */
+      .accordion-item-nested{
+            padding: var(--dr-spacing-2);
+
+            .accordion-header-nested{
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  cursor: pointer;
+                  transition: background-color 0.2s;
+                  border-radius: 1rem;
+            }
+
+            .accordion-icon-nested{
+                  font-size: 1.5rem;
+                  font-weight: bold;
+            }
+            .accordion-plus-nested{
+                  display: inline-block;
+            }
+            .accordion-minus-nested{
+                  display: none;
+            }
+            .accordion-content-nested{
+                  display: none;
+                  max-height: 20rem;
+                  overflow-y: scroll;
+                  transition: max-height 0.2s ease;
+                  padding: 0 1.5rem;
+
+                  p{
+                        text-align: left;
+                  }
+            }
+            &.active .accordion-content-nested {
+                  display: block
+            }
+            &.active .accordion-plus-nested {
+                  display: none;
+            }
+            &.active .accordion-minus-nested {
+                  display: inline-block;
+            }
+            .question{
+                  text-align: left;
+            }
+            .answer-correct{
+                  color: var(--dr-success);
+            }
+            .answer-incorrect{
+                  color: var(--dr-danger);
+            }
+      }
     </style>
 
     <script src="/public/categories_db.js"></script>
@@ -195,8 +249,8 @@
         <h3 class="mb-4">Players</h3>
         <div class="accordion-container">
         {{range .Sessions}}
-        <div class="accordion-item {{if gt .SuccessRate 100}}none{{else if ge .SuccessRate 81}}correct{{else if ge .SuccessRate 51}}average{{else}}incorrect{{end}}" role="button" onclick="toggleAccordion(this)">
-            <div class="accordion-header">
+        <div class="accordion-item {{if gt .SuccessRate 100}}none{{else if ge .SuccessRate 81}}correct{{else if ge .SuccessRate 51}}average{{else}}incorrect{{end}}" role="button">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
                   <div>
                         <h4>Player: {{.PlayerName}}</h4>
                         <h5>Score: {{.SuccessRate}}%</h5>
@@ -204,29 +258,37 @@
                   <div class="accordion-icon">
                         <span class="accordion-plus">+</span><span class="accordion-minus">−</span></div>
             </div>
-            <div class="accordion-content">
-                  <div id="player-results-{{.ID}}">
-                  <div class="results-display"></div>
-                  </div>
+            <div>
+                  <div id="player-results-{{.ID}}" class="results-display accordion-content"></div>
                   <script>
-                  Object.keys(yourAnswers).forEach((key) => {
-                        const question = categories[key]["question"];
-                        const yourSelection =
-                        categories[key]["options"][yourAnswers[key].selection];
-                  const playerAnswer = categories[key]["options"][{{.Answers}}[key]?.selection];
+                        Object.keys(yourAnswers).forEach((key) => {
+                              const question = categories[key]["question"];
+                              const yourSelection =
+                              categories[key]["options"][yourAnswers[key].selection];
+                        const playerAnswer = categories[key]["options"][{{.Answers}}[key]?.selection];
 
-                  const resultsDisplay = document.querySelector(
-                        `#player-results-{{.ID}} .results-display`
-                  );
+                        const resultsDisplay = document.querySelector(
+                              `#player-results-{{.ID}}.results-display`
+                        );
 
-                  resultsDisplay.innerHTML += `
-                        <div class="question ${ {{.Answers}}[key]?.isCorrect ? "answer-correct" : "answer-incorrect" }">
-                        <b>${question}</b>
-                        <p>Your answer: ${yourSelection || "None"}</p>
-                        <p>Their answer: ${playerAnswer || "None"}</p>
+                        resultsDisplay.innerHTML += `
+                        <div class="accordion-item-nested">
+                              <div class="accordion-header-nested" onclick="toggleAccordionNested(this)">
+                                    <p class="question ${ {{.Answers}}[key]?.isCorrect ? "answer-correct" : "answer-incorrect" }">
+                                          ${question}
+                                    </p>
+                                    <div class="accordion-icon-nested">
+                                          <span class="accordion-plus-nested">+</span>
+                                          <span class="accordion-minus-nested">−</span>
+                                    </div>
+                              </div>
+                              <div class="accordion-content-nested">
+                                    <p>Your answer: ${yourSelection || "None"}</p>
+                                    <p>Their answer: ${playerAnswer || "None"}</p>
+                              </div>
                         </div>
-                  `;
-                  });
+                        `;
+                        });
                   </script>
             </div>
         </div>
@@ -257,7 +319,13 @@
     </main>
     <script>
       function toggleAccordion(element) {
-            element.classList.toggle("active");
+            element.parentElement.classList.toggle("active");
+      }
+
+      function toggleAccordionNested(element) {
+            // get the next sibling
+            // element.stopPropagation();
+            element.parentElement.classList.toggle("active");
       }
     </script>
   </body>
