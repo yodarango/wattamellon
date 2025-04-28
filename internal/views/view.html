@@ -169,6 +169,16 @@
         background-color: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.3);
       }
+      
+      .btn-danger{
+            background-color: var(--dr-danger);
+            color: var(--dr-alpha);
+            padding: 1.6rem 2rem;
+            border-radius: 2rem;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+      }
 
       /* nested accordion */
       .accordion-item-nested{
@@ -239,7 +249,8 @@
             <h1>Game sessions for {{.Game.Name}}</h1>
             <img src="/public/images/avatars/{{.Game.Thumbnail}}" alt="{{.Game.Name}}" />
             <input type="text" value="" id="gameLink" readonly class="d-none" />
-            <button onclick="copyLink()" class="btn-primary w-100">Share Game Link</button>
+            <button onclick="copyLink()" class="btn-primary w-100 mb-2">Share Game Link</button>
+            <button onclick="deleteGame()" class="btn-danger w-100">Delete Game</button>
       </section>
 
       <!-- dummy div for varaible data storage since it is much easier to parse with JS -->
@@ -299,7 +310,7 @@
         <p>No players have played this game yet.</p>
         {{end}}
       </div>
-      <button onclick="deleteGame()">Delete Game</button>
+    
 
       <script>
         const gameId = window.location.pathname.split("/").pop();
