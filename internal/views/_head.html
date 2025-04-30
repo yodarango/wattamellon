@@ -77,12 +77,13 @@
   src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
 ></script>
 
-<!-- Base Styles -->
+<!-- Styles -->
 <link
   rel="stylesheet"
   type="text/css"
   href="https://cdn.danielrangel.net/fullds.min.css"
 />
+<link rel="stylesheet" type="text/css" href="/public/app.css" />
 
 <!-- Title can be overridden in specific templates -->
 <title>
@@ -139,6 +140,25 @@
     let gameToken = localStorage.getItem(name);
     gameToken = JSON.parse(gameToken || "{}");
     return gameToken;
+  }
+
+  /*************************************************************************************************
+   * Give me an array and I will return a random selection of 2 options
+   * **********************************************************************************************/
+  function getRandomOptions(options) {
+    const keys = Object.keys(options);
+    shuffleArray(keys);
+    return keys.slice(0, 2).map((key) => ({ id: key, value: options[key] }));
+  }
+
+  /*************************************************************************************************
+   * Give me an array and I will shuffle it. I will NOT return anything. I modify the original
+   * **********************************************************************************************/
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
   }
 
   function getUserToken() {
