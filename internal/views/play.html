@@ -8,366 +8,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script
-      defer=""
-      data-domain="shrood.app"
-      src="https://plausible.io/js/script.js"
-    ></script>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=no"
-    />
-
-    <link rel="canonical" href="https://shrood.app/apps/wattamellon" />
-    <link rel="alternate" hreflang="en" href="https://shrood.app" />
-    <meta property="og:site_name" content="Shrood" />
-    <meta name="robots" content="index, follow" />
-    <meta property="og:type" content="website" />
-    <meta
-      property="og:title"
-      content="Wattamellon - How well do you know me?"
-    />
-    <meta property="og:locale" content="en_US" />
-    <meta
-      name="twitter:title"
-      content="Wattamellon - How well do you know me?"
-    />
-    <meta property="og:article:author" content="Daniel Rangel" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@shrood" />
-    <meta name="twitter:creator" content="@yodarango" />
-    <meta
-      property="og:image"
-      content="/public/images/web_hosted_apps/wattamellon.webp"
-    />
-    <meta
-      name="keywords"
-      content="Wattamellon, friendship trivia game, who knows me best, social quiz app, funny friend quiz, viral quiz game, party game, friend group challenge, quiz about me, best friend test, fun with friends, get to know your friends, who knows you better, multiplayer quiz"
-    />
-
-    <meta
-      name="description"
-      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
-    />
-    <meta property="og:url" content="https://shrood.app/apps/wattamellon" />
-    <meta
-      property="og:description"
-      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
-    />
-    <meta
-      name="twitter:description"
-      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
-    />
-    <meta
-      name="twitter:image"
-      content="/public/images/web_hosted_apps/wattamellon.webp"
-    />
-
-    <link
-      rel="apple-touch-icon"
-      href="/public/images/web_hosted_apps/wattamellon.webp"
-    />
-    <link rel="manifest" href="/public/manifest.json" />
-
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdn.danielrangel.net/fullds.min.css"
-    />
-
-    <link
-      rel="icon"
-      type="image/png"
-      href="/public/images/logo_round_pow_smalll.png"
-    />
-
-    <title>Shrood | Wattamellon - {{.Name}} - How well do you know me?</title>
-    <style>
-      #game-container,
-      #game-container-done,
-      #game-container-submitted {
-        display: none;
-      }
-
-      #start-game-session {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 1.6rem;
-        text-align: center;
-        padding: 2rem 0;
-        margin: 2rem auto 0;
-      }
-
-      #start-game-session h1 {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-      }
-
-      #start-game-session input {
-        width: 100%;
-        border: 1px solid var(--dr-delta);
-        border-radius: 2rem;
-        padding: 1.6rem;
-        display: block;
-      }
-
-      #start-game-session button {
-        background-color: var(--dr-delta);
-        color: var(--dr-alpha);
-        padding: 1.6rem 2rem;
-        border-radius: 2rem;
-        border: none;
-        cursor: pointer;
-        width: 100%;
-      }
-
-      #game-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        gap: 2rem;
-        padding: 2rem 0;
-        margin: 2rem auto 0;
-      }
-
-      #game-container h4 {
-        font-size: 1.2rem;
-        color: var(--dr-alpha);
-        opacity: 0.7;
-        margin: 0;
-      }
-
-      #game-container h3 {
-        font-size: 1.8rem;
-        margin: 0.5rem 0 1.5rem;
-        max-width: 90%;
-      }
-
-      .options-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-        width: 100%;
-      }
-
-      .option-card {
-        background-color: rgba(var(--dr-alpha-rgb), 0.2);
-        color: var(--dr-alpha);
-        border: 0.1rem solid rgba(var(--dr-alpha-rgb), 0.25);
-        border-radius: 2rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: var(--dr-spacing-4);
-        aspect-ratio: 1/1;
-        font-size: 1.2rem;
-        transition: all 0.2s ease;
-      }
-
-      .option-card:hover {
-        background-color: rgba(var(--dr-alpha-rgb), 0.4);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        scale: .9;
-        color: var(--dr-beta);
-        transform: translateY(-3px);
-        transition: 300ms;
-      }
-
-      #game-container-done {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 1.6rem;
-        text-align: center;
-        padding: 2rem 0;
-        margin: 2rem auto 0;
-      }
-
-      #game-container-done h2 {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-      }
-
-      #game-container-done button {
-        background-color: var(--dr-delta);
-        color: var(--dr-alpha);
-        padding: 1.6rem 2rem;
-        border-radius: 2rem;
-        border: none;
-        cursor: pointer;
-        width: 100%;
-        max-width: 400px;
-      }
-
-      #game-container-submitted {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 1.6rem;
-        text-align: center;
-        padding: 2rem 0;
-        margin: 2rem auto 0;
-      }
-
-      #game-container-submitted h2 {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-      }
-
-      #game-results {
-        width: 100%;
-        margin-top: 2rem;
-      }
-
-      #game-results h3 {
-        margin: 1.5rem 0 1rem;
-      }
-
-      /* Score summary styles */
-      .score-summary {
-        background-color: var(--dr-gamma);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        text-align: center;
-      }
-
-      /* Pie chart styles */
-      .pie-chart-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 1.5rem;
-      }
-
-      .pie-chart {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        margin-bottom: 1rem;
-      }
-
-      .pie-chart-legend {
-        display: flex;
-        justify-content: center;
-        gap: 1.5rem;
-        margin-top: 0.5rem;
-      }
-
-      .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .legend-color {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        border-radius: 4px;
-      }
-
-      .correct-color {
-        background-color: var(--dr-success, #4CAF50);
-      }
-
-      .incorrect-color {
-        background-color: var(--dr-danger, #FF5252);
-      }
-
-      .legend-label {
-        font-size: 0.9rem;
-      }
-
-      /* Accordion styles */
-      .accordion-container {
-        width: 100%;
-      }
-
-      .accordion-item {
-        margin-bottom: 1rem;
-        border-radius: 1rem;
-      }
-
-      .accordion-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 1.5rem;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        border-radius: 1rem;
-      }
-
-      .accordion-icon {
-        font-size: 1.5rem;
-        font-weight: bold;
-      }
-
-      .accordion-plus {
-        display: inline-block;
-      }
-
-      .accordion-minus {
-        display: none;
-      }
-
-      .accordion-content {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.2s ease;
-        padding: 0 1.5rem;
-
-        p{
-            text-align: left;
-        }
-      }
-
-      .accordion-item.active .accordion-content {
-        padding-bottom: 1rem;
-        max-height: 20rem;
-      }
-
-      .accordion-item.active .accordion-plus {
-        display: none;
-      }
-
-      .accordion-item.active .accordion-minus {
-        display: inline-block;
-      }
-
-      .accordion-item.correct {
-        background-color: rgba(0, 200, 0, 0.1);
-        border: 1px solid rgba(0, 200, 0, 0.3);
-      }
-
-      .accordion-item.incorrect {
-        background-color: rgba(255, 0, 0, 0.1);
-        border: 1px solid rgba(255, 0, 0, 0.3);
-      }
-
-      .thumbnail {
-            width: 100%;
-            max-width: 20rem;
-            margin: auto;
-            object-fit: contain;
-            object-position: center;
-            display: block;
-      }
-    </style>
-
-    <script src="/public/categories_db.js"></script>
-    <link       rel="stylesheet"
-      type="text/css" href="/public/app.css"></link>
+    {{template "head" .}}
   </head>
   <body>
     <main>
@@ -375,7 +16,12 @@
       <div id="start-game-session">
         <h1>Start Playing {{.Game.Name}}</h1>
         <p>Created by {{.Game.PlayerName}}</p>
-        <input type="text" id="player_name" placeholder="Your Name" class="mb-4" />
+        <input
+          type="text"
+          id="player_name"
+          placeholder="Your Name"
+          class="mb-4"
+        />
         <!-- Not allowing users to pick size for now -->
         <input type="hidden" id="gameId" value="{{.Game.ID}}" />
         <button onclick="createGame()">Start Game</button>
@@ -388,7 +34,9 @@
       <div id="game-container-done">
         <h2>You have completed this game!</h2>
         <img src="/public/images/thank_you_4000.webp" class="thumbnail" />
-        <p class="mb-4">Submit your answers to see how well you know {{.Game.PlayerName}}.</p>
+        <p class="mb-4">
+          Submit your answers to see how well you know {{.Game.PlayerName}}.
+        </p>
         <button onclick="submitGame()">Submit Answers</button>
       </div>
 
@@ -401,6 +49,8 @@
       </div>
 
       <script>
+        console.log("{{.Session}}");
+
         /*************************************************************************************************
          * Four screens are possible:
          * 1. Create a game player (default)
@@ -409,6 +59,12 @@
          * 4. Game is submitted (the user has submitted the game)
          * *****************************************************************************/
         document.addEventListener("DOMContentLoaded", () => {
+          // Make sure gameId is available before checking localStorage
+          if (!document.getElementById("gameId")) {
+            renderView("create");
+            return;
+          }
+
           const gameToken = getGameToken();
           if (gameToken.game_id) {
             if (gameToken.is_submitted) {
@@ -431,9 +87,13 @@
 
         /*************************************************************************************************
          * Get and return the game token from the local storage
+         * Uses game ID to create a unique key for each game
          * **********************************************************************************************/
         function getGameToken() {
-          let gameToken = localStorage.getItem("wattamellon_token_player");
+          const gameId = document.getElementById("gameId").value;
+          let gameToken = localStorage.getItem(
+            `wattamellon_token_player_${gameId}`
+          );
           gameToken = JSON.parse(gameToken || "{}");
           return gameToken;
         }
@@ -463,16 +123,6 @@
          * The new game session is created here. The user will be able to select the answers to the
          * **********************************************************************************************/
         async function createGame() {
-          // Generates a random token for the game
-          function generateToken() {
-            let token = "";
-            const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-            for (let i = 0; i < 25; i++) {
-              token += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return token;
-          }
-
           const playerName = document.getElementById("player_name").value;
           const gameId = document.getElementById("gameId").value;
           const playerToken = generateToken();
@@ -508,17 +158,15 @@
 
           if (success) {
             // update the game token with the order of the questions
-            if (!(Object.keys(playerToken.questions || {}) > 0)) {
-              updateGameToken({
-                player_token: data.player_token,
-                game_id: data.game_id,
-                answers: emtpyAnswers,
-                is_complete: false,
-                current_index: 0,
-                success_rate: 0,
-                id: data.id,
-              });
-            }
+            updateGameState({
+              player_token: data.player_token,
+              game_id: data.game_id,
+              answers: emtpyAnswers,
+              is_complete: false,
+              current_index: 0,
+              success_rate: 0,
+              id: data.id,
+            });
             renderView("game");
           } else {
             alert("Error creating game: " + data.error);
@@ -591,7 +239,7 @@
                 };
                 gameToken.current_index = currentIndex;
                 gameToken.is_complete = currentIndex >= categorieKeys.length;
-                updateGameToken(gameToken);
+                updateGameState(gameToken);
                 showNextQuestion();
               };
               optionsContainer.appendChild(card);
@@ -655,7 +303,7 @@
             gameToken.correct_answers = correctAnswers;
             gameToken.success_rate = successRate;
             gameToken.is_submitted = true;
-            updateGameToken(gameToken);
+            updateGameState(gameToken);
 
             updateFinalResults();
 
@@ -687,8 +335,8 @@
           const correctAngle = (correct_answers / totalQuestions) * 360;
 
           // Create the score summary with pie chart
-          const scoreSummary = document.createElement('div');
-          scoreSummary.className = 'score-summary';
+          const scoreSummary = document.createElement("div");
+          scoreSummary.className = "score-summary";
           scoreSummary.innerHTML = `
             <h3>Your Score: ${scorePercentage}%</h3>
             <div class="pie-chart-container">
@@ -707,26 +355,28 @@
           `;
 
           // Create the answer breakdown title
-          const breakdownTitle = document.createElement('h3');
-          breakdownTitle.textContent = 'Answer Breakdown:';
+          const breakdownTitle = document.createElement("h3");
+          breakdownTitle.textContent = "Answer Breakdown:";
 
           // Create the accordion container
-          const accordionContainer = document.createElement('div');
-          accordionContainer.className = 'accordion-container';
+          const accordionContainer = document.createElement("div");
+          accordionContainer.className = "accordion-container";
 
           // Clear the results container and add the new elements
-          resultsContainer.innerHTML = '';
+          resultsContainer.innerHTML = "";
           resultsContainer.appendChild(scoreSummary);
           resultsContainer.appendChild(breakdownTitle);
           resultsContainer.appendChild(accordionContainer);
 
           // Get CSS variables for colors
           const computedStyle = getComputedStyle(document.documentElement);
-          const successColor = computedStyle.getPropertyValue('--dr-success') || '#4CAF50';
-          const dangerColor = computedStyle.getPropertyValue('--dr-danger') || '#FF5252';
+          const successColor =
+            computedStyle.getPropertyValue("--dr-success") || "#4CAF50";
+          const dangerColor =
+            computedStyle.getPropertyValue("--dr-danger") || "#FF5252";
 
           // Set the pie chart gradient using CSS variables
-          const pieChart = document.getElementById('results-pie-chart');
+          const pieChart = document.getElementById("results-pie-chart");
           pieChart.style.backgroundImage = `conic-gradient(
             ${successColor} 0deg ${correctAngle}deg,
             ${dangerColor} ${correctAngle}deg 360deg
@@ -735,35 +385,44 @@
           // Add each question as an accordion item
           Object.keys(answers).forEach((key, index) => {
             const question = categories[key].question;
-            const selectedOption = categories[key]["options"][answers[key].selection];
-            const creatorSelectOption = categories[key]["options"][gameQuestionsParsed[key].selection];
+            const selectedOption =
+              categories[key]["options"][answers[key].selection];
+            const creatorSelectOption =
+              categories[key]["options"][gameQuestionsParsed[key].selection];
             const isCorrect = answers[key].isCorrect;
 
-            const accordionItem = document.createElement('div');
-            accordionItem.className = `accordion-item ${isCorrect ? "correct" : "incorrect"}`;
+            const accordionItem = document.createElement("div");
+            accordionItem.className = `accordion-item ${
+              isCorrect ? "correct" : "incorrect"
+            }`;
 
-            const accordionHeader = document.createElement('div');
-            accordionHeader.className = 'accordion-header';
-            accordionHeader.onclick = function() { toggleAccordion(index); };
+            const accordionHeader = document.createElement("div");
+            accordionHeader.className = "accordion-header";
+            accordionHeader.onclick = function () {
+              toggleAccordion(index);
+            };
 
-            const questionText = document.createElement('p');
+            const questionText = document.createElement("p");
             questionText.textContent = question;
 
-            const accordionIcon = document.createElement('div');
-            accordionIcon.className = 'accordion-icon';
-            accordionIcon.innerHTML = '<span class="accordion-plus">+</span><span class="accordion-minus">−</span>';
+            const accordionIcon = document.createElement("div");
+            accordionIcon.className = "accordion-icon";
+            accordionIcon.innerHTML =
+              '<span class="accordion-plus">+</span><span class="accordion-minus">−</span>';
 
             accordionHeader.appendChild(questionText);
             accordionHeader.appendChild(accordionIcon);
 
-            const accordionContent = document.createElement('div');
-            accordionContent.className = 'accordion-content';
+            const accordionContent = document.createElement("div");
+            accordionContent.className = "accordion-content";
 
-            const yourAnswer = document.createElement('p');
+            const yourAnswer = document.createElement("p");
             yourAnswer.innerHTML = `<strong>Your answer:</strong> ${selectedOption}`;
 
-            const correctAnswer = document.createElement('p');
-            correctAnswer.innerHTML = `<strong>${isCorrect ? "Correct!" : "Correct answer was:"}</strong> ${creatorSelectOption}`;
+            const correctAnswer = document.createElement("p");
+            correctAnswer.innerHTML = `<strong>${
+              isCorrect ? "Correct!" : "Correct answer was:"
+            }</strong> ${creatorSelectOption}`;
 
             accordionContent.appendChild(yourAnswer);
             accordionContent.appendChild(correctAnswer);
@@ -775,9 +434,9 @@
           });
 
           // Add the toggle function for the accordion
-          window.toggleAccordion = function(index) {
-            const accordionItems = document.querySelectorAll('.accordion-item');
-            accordionItems[index].classList.toggle('active');
+          window.toggleAccordion = function (index) {
+            const accordionItems = document.querySelectorAll(".accordion-item");
+            accordionItems[index].classList.toggle("active");
           };
         }
 
@@ -834,14 +493,16 @@
         }
 
         /*************************************************************************************************
-         * Give me a token and I will update the local storage with the token. I already know the key
+         * Give me a token and I will update the local storage with the token using a game-specific key
          * **********************************************************************************************/
-        function updateGameToken(token) {
+        function updateGameState(token) {
+          const gameId = document.getElementById("gameId").value;
           localStorage.setItem(
-            "wattamellon_token_player",
+            `wattamellon_token_player_${gameId}`,
             JSON.stringify(token)
           );
         }
+        updateGameState({});
       </script>
     </main>
   </body>

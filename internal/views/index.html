@@ -1,88 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script
-      defer=""
-      data-domain="shrood.app"
-      src="https://plausible.io/js/script.js"
-    ></script>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=no"
-    />
-
-    <link rel="canonical" href="https://shrood.app/apps/wattamellon" />
-    <link rel="alternate" hreflang="en" href="https://shrood.app" />
-    <meta property="og:site_name" content="Shrood" />
-    <meta name="robots" content="index, follow" />
-    <meta property="og:type" content="website" />
-    <meta
-      property="og:title"
-      content="Wattamellon - How well do you know me?"
-    />
-    <meta property="og:locale" content="en_US" />
-    <meta
-      name="twitter:title"
-      content="Wattamellon - How well do you know me?"
-    />
-    <meta property="og:article:author" content="Daniel Rangel" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@shrood" />
-    <meta name="twitter:creator" content="@yodarango" />
-    <meta
-      property="og:image"
-      content="/public/images/web_hosted_apps/wattamellon.webp"
-    />
-    <meta
-      name="keywords"
-      content="Wattamellon, friendship trivia game, who knows me best, social quiz app, funny friend quiz, viral quiz game, party game, friend group challenge, quiz about me, best friend test, fun with friends, get to know your friends, who knows you better, multiplayer quiz"
-    />
-
-    <meta
-      name="description"
-      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
-    />
-    <meta property="og:url" content="https://shrood.app/apps/wattamellon" />
-    <meta
-      property="og:description"
-      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
-    />
-    <meta
-      name="twitter:description"
-      content="Wattamellon is the ultimate friendship test — create quizzes about yourself and see which of your friends actually knows you best. Laugh and reveal the unexpected. It’s social, fun, and a bit more personal than your average trivia game."
-    />
-    <meta
-      name="twitter:image"
-      content="/public/images/web_hosted_apps/wattamellon.webp"
-    />
-
-    <link
-      rel="apple-touch-icon"
-      href="/public/images/web_hosted_apps/wattamellon.webp"
-    />
-
-    <!-- manifest and local data -->
-    <link rel="manifest" href="/public/manifest.json" />
-    <link rel="manifest" href="/public/avatars.js" />
-
-    <!-- icons -->
-     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-      <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdn.danielrangel.net/fullds.min.css"
-    />
-
-    <link
-      rel="icon"
-      type="image/png"
-      href="/public/images/logo_round_pow_smalll.png"
-    />
-
-    <title>Shrood | Wattamellon - How well do you know me?</title>
+    {{template "head" .}}
     <style>
       #game-container,
       #game-container-done,
@@ -383,12 +302,40 @@
         <button onclick="navigateToView()" class="btn-secondary w-100">See who has played</button>
       </div>
       <script>
-        // Avatar selection variables
+       
+        /*************************************************************************************************
+         * Four screens are possible:
+         * 1. Create a game (default)
+         * 2. Play the game (the user ahs submitted the game information)
+         * 3. Game is done (the user has answered all the questions but not submitted)
+         * 4. Game is submitted (the user has submitted the game)
+         * *****************************************************************************/
+        document.addEventListener("DOMContentLoaded", () => {
+          const gameToken = getGameStateFromLocalStorage();
+          if (gameToken.game_id) {
+            if (gameToken.is_submitted) {
+              renderView("submitted");
+              return;
+            }
+
+            if (gameToken.is_complete) {
+              renderView("done");
+              return;
+            }
+
+            renderView("game");
+          } else {
+            renderView("create");
+          }
+        });
+
         let currentAvatarIndex = 0;
         const avatarsPerPage = 10;
         let selectedAvatar = null;
 
-        // Avatar dialog functions
+      /* **********************************************************************************
+       * Avatar selection functions
+       * **********************************************************************************/
         function openAvatarDialog() {
           document.getElementById('avatar-dialog').style.display = 'block';
 
@@ -402,6 +349,9 @@
           document.getElementById('avatar-dialog').style.display = 'none';
         }
 
+      /* **********************************************************************************
+       * creates html elements for the avatars "load more."
+       * **********************************************************************************/
         function loadMoreAvatars() {
           const container = document.getElementById('avatars-container');
           const loadMoreBtn = document.getElementById('load-more-btn');
@@ -442,6 +392,9 @@
           }
         }
 
+      /* **********************************************************************************
+       * Select an avatar and add the value to the hidden input
+       * **********************************************************************************/
         function selectAvatar(file, name) {
           // Update selected avatar
           selectedAvatar = file;
@@ -472,41 +425,6 @@
         }
 
         /*************************************************************************************************
-         * Four screens are possible:
-         * 1. Create a game (default)
-         * 2. Play the game (the user ahs submitted the game information)
-         * 3. Game is done (the user has answered all the questions but not submitted)
-         * 4. Game is submitted (the user has submitted the game)
-         * *****************************************************************************/
-        document.addEventListener("DOMContentLoaded", () => {
-          const gameToken = getGameTokenFromLocalStorage();
-          if (gameToken.game_id) {
-            if (gameToken.is_submitted) {
-              renderView("submitted");
-              return;
-            }
-
-            if (gameToken.is_complete) {
-              renderView("done");
-              return;
-            }
-
-            renderView("game");
-          } else {
-            renderView("create");
-          }
-        });
-
-        /*************************************************************************************************
-         * Get and return the game token from the local storage
-         * **********************************************************************************************/
-        function getGameTokenFromLocalStorage() {
-          let gameToken = localStorage.getItem("wattamellon_token");
-          gameToken = JSON.parse(gameToken || "{}");
-          return gameToken;
-        }
-
-        /*************************************************************************************************
          * Give me an array and I will return a random selection of 2 options
          * **********************************************************************************************/
         function getRandomOptions(options) {
@@ -531,7 +449,7 @@
          * Navigate to the view page
          * **********************************************************************************************/
         function navigateToView() {
-          const { game_id, creatorToken } = getGameTokenFromLocalStorage();
+          const { game_id, creatorToken } = getGameStateFromLocalStorage("wattamellon_game");
           window.location.href = "/view/" + game_id;
         }
 
@@ -539,7 +457,7 @@
          * Copy the game link to the clipboard so the user can share it
          * **********************************************************************************************/
         function shareGameLink(){
-            const { game_id, creatorToken } = getGameTokenFromLocalStorage();
+            const { game_id, creatorToken } = getGameStateFromLocalStorage("wattamellon_game");
             navigator.clipboard.writeText(window.location.origin + "/view/" + game_id);
             alert("Link copied!");
         }
@@ -549,16 +467,6 @@
          * there are any emtpy fields the user will be alerted.
          * **********************************************************************************************/
         async function createGame() {
-          // Generates a random token for the game
-          function generateToken() {
-            let token = "";
-            const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-            for (let i = 0; i < 25; i++) {
-              token += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return token;
-          }
-
           // gets the current values set in the form to create a game
           function getFormValues() {
             const thumbnail = document.getElementById("selected_avatar").value;
@@ -570,7 +478,7 @@
           }
 
           const { name, playerName, size, thumbnail } = getFormValues();
-          const creatorToken = generateToken();
+          const creatorToken = getUserToken();
 
           // alert the user if they have not selected a thumbnail or have not entered a name
           if (!thumbnail) {
@@ -586,7 +494,7 @@
             return;
           }
 
-          const gameToken = getGameTokenFromLocalStorage();
+          const gameToken = getGameStateFromLocalStorage("wattamellon_game");
           const categorieKeys = Object.keys(categories).splice(0, size);
           // shuffle the categories so that the questions are not in the same order
           shuffleArray(categorieKeys);
@@ -614,7 +522,7 @@
           if (success) {
             // update the game token with the order of the questions
             if (!(Object.keys(gameToken.questions || {}) > 0)) {
-              updateGameToken({
+              updateGameState({
                 creator_token: data.creator_token,
                 questions: emtpyQuestions,
                 thumbnail: data.thumbnail,
@@ -641,7 +549,7 @@
          * **********************************************************************************************/
         function renderCards() {
           // get the game token from the local storage, so the state is preserved
-          const gameToken = getGameTokenFromLocalStorage();
+          const gameToken = getGameStateFromLocalStorage("wattamellon_game");
           const categorieKeys = Object.keys(gameToken.questions);
 
           // also get the current index of the game so we know which question to show
@@ -695,7 +603,7 @@
                 };
                 gameToken.current_index = currentIndex;
                 gameToken.is_complete = currentIndex >= categorieKeys.length;
-                updateGameToken(gameToken);
+                updateGameState(gameToken);
                 showNextQuestion();
               };
               optionsContainer.appendChild(card);
@@ -713,7 +621,7 @@
         async function submitGame() {
           // check that the user has answered all the questions
 
-          const gameToken = getGameTokenFromLocalStorage();
+          const gameToken = getGameStateFromLocalStorage("wattamellon_game");
           const { creator_token, game_id, questions, is_complete } = gameToken;
 
           if (!is_complete) {
@@ -734,11 +642,10 @@
           const data = await res.json();
           if (data.success) {
             gameToken.is_submitted = true;
-            updateGameToken(gameToken);
+            updateGameState(gameToken);
 
             alert("Game submitted! You can now view the results.");
             renderView("submitted");
-            //     window.location.href = "/view/" + game_id;
           } else {
             alert("Error submitting game.");
           }
@@ -792,12 +699,6 @@
           }
         }
 
-        /*************************************************************************************************
-         * Give me a token and I will update the local storage with the token. I already know the key
-         * **********************************************************************************************/
-        function updateGameToken(token) {
-          localStorage.setItem("wattamellon_token", JSON.stringify(token));
-        }
       </script>
     </main>
   </body>

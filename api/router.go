@@ -19,7 +19,7 @@ func Router () *http.ServeMux{
 
 	// POST
 	mux.HandleFunc("/new-game", NewGame)
-	// POST 
+	// POST
 	mux.HandleFunc("/complete-game", CompleteGame)
 	// POST
 	mux.HandleFunc("/new-game-session", NewGameSession)
@@ -42,7 +42,7 @@ type Game struct {
 	PlayerName   string    `json:"player_name"`
 	Size         int       `json:"size"`
 	CreatorToken string    `json:"creator_token"`
-	Questions    string   `json:"questions"` 
+	Questions    string   `json:"questions"`
 	Thumbnail string 	     `json:"thumbnail"`
 	Created      string    `json:"created"`
 	IsCompleted  bool      `json:"is_complete"`
@@ -52,7 +52,7 @@ type GameSession struct {
 	ID          int       `json:"id"`
 	GameID      int       `json:"game_id"`
 	PlayerToken string    `json:"player_token"`
-	Answers     string    `json:"answers"`    
+	Answers     string    `json:"answers"`
 	IsCompleted bool      `json:"is_completed"`
 	SuccessRate int       `json:"success_rate"`
 	PlayerName   string    `json:"player_name"`
@@ -65,7 +65,7 @@ type HttpResponse struct{
 	Error string `json:"error"`
 }
 
-func NewGame(w http.ResponseWriter, r *http.Request){ 
+func NewGame(w http.ResponseWriter, r *http.Request){
 
 	var response HttpResponse
 	var game Game
@@ -81,7 +81,7 @@ func NewGame(w http.ResponseWriter, r *http.Request){
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not bufferize body" ,err)
-		return 
+		return
 	}
 
 	defer r.Body.Close()
@@ -95,7 +95,7 @@ func NewGame(w http.ResponseWriter, r *http.Request){
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Printf("could not unmarshall body %v" ,err)
-		return 
+		return
 	}
 
 	query := `
@@ -114,7 +114,7 @@ func NewGame(w http.ResponseWriter, r *http.Request){
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not create game" ,err)
-		return 
+		return
 	}
 
 	lastId, _ := result.LastInsertId()
@@ -129,7 +129,7 @@ func NewGame(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(response)
 }
 
-func CompleteGame(w http.ResponseWriter, r *http.Request){ 
+func CompleteGame(w http.ResponseWriter, r *http.Request){
 
 	var response HttpResponse
 	var game Game
@@ -145,7 +145,7 @@ func CompleteGame(w http.ResponseWriter, r *http.Request){
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not bufferize body" ,err)
-		return 
+		return
 	}
 
 	defer r.Body.Close()
@@ -159,7 +159,7 @@ func CompleteGame(w http.ResponseWriter, r *http.Request){
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Printf("could not unmarshall body %v" ,err)
-		return 
+		return
 	}
 
 	query := `
@@ -175,7 +175,7 @@ func CompleteGame(w http.ResponseWriter, r *http.Request){
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not create game" ,err)
-		return 
+		return
 	}
 
 	lastId, _ := result.LastInsertId()
@@ -205,7 +205,7 @@ func NewGameSession(w http.ResponseWriter, r *http.Request) {
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not bufferize body" ,err)
-		return 
+		return
 	}
 
 	defer r.Body.Close()
@@ -219,7 +219,7 @@ func NewGameSession(w http.ResponseWriter, r *http.Request) {
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not unmarshall body" ,err)
-		return 
+		return
 	}
 
 	query := `
@@ -238,7 +238,7 @@ func NewGameSession(w http.ResponseWriter, r *http.Request) {
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not create game" ,err)
-		return 
+		return
 	}
 
 	lastId, _ := result.LastInsertId()
@@ -268,7 +268,7 @@ func SubmitGameSession(w http.ResponseWriter, r *http.Request) {
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not bufferize body" ,err)
-		return 
+		return
 	}
 
 	defer r.Body.Close()
@@ -282,11 +282,11 @@ func SubmitGameSession(w http.ResponseWriter, r *http.Request) {
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not unmarshall body" ,err)
-		return 
+		return
 	}
 
 	query := `
-		UPDATE game_sessions 
+		UPDATE game_sessions
 		SET is_completed = true, success_rate = ?, answers = ?
 		WHERE id = ? AND player_token = ? ;
 	`
@@ -300,7 +300,7 @@ func SubmitGameSession(w http.ResponseWriter, r *http.Request) {
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not create game" ,err)
-		return 
+		return
 	}
 
 	response.Success = true
@@ -313,16 +313,19 @@ func SubmitGameSession(w http.ResponseWriter, r *http.Request) {
 // Renders index.html, the home page
 // this is the page where the user can create a new game
 func GetHomePage(w http.ResponseWriter, r *http.Request){
-	temp, err := template.ParseFiles("internal/views/index.html")
+	temp, err := template.ParseFiles("internal/views/index.html", "internal/views/_head.html")
 
 	if err != nil {
-		fmt.Println("Unable to parse file")
+		fmt.Printf("Unable to parse file %v", err)
 	}
 
-	err = temp.Execute(w, nil)
-	
+	templateData := map[string]interface{}{
+		"Title": "Wattamellon - How well do you know me?",
+	}
+	err = temp.Execute(w, templateData)
+
 	if err != nil {
-		fmt.Println("Unable to execute file")
+		fmt.Printf("Unable to execute file %v", err)
 	}
 }
 
@@ -342,12 +345,12 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 	row := RouterConfig.DB.Conn.QueryRow(query, gameId)
 
 	err := row.Scan(
-		&gameSession.ID, 
-		&gameSession.GameID, 
-		&gameSession.PlayerToken, 
-		&gameSession.Answers, 
-		&gameSession.IsCompleted, 
-		&gameSession.SuccessRate, 
+		&gameSession.ID,
+		&gameSession.GameID,
+		&gameSession.PlayerToken,
+		&gameSession.Answers,
+		&gameSession.IsCompleted,
+		&gameSession.SuccessRate,
 		&gameSession.Created)
 
 	if err != nil && err != sql.ErrNoRows {
@@ -357,7 +360,7 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not create game" ,err)
-		return 
+		return
 	}
 
 	row = RouterConfig.DB.Conn.QueryRow(`SELECT id, name, player_name, thumbnail, creator_token, questions FROM games WHERE id = ?;`, gameId)
@@ -380,22 +383,22 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Success = true
-	response.Data = map[string]interface{}{"Session": gameSession, "Game": game}
+	response.Data = map[string]interface{}{"Session": gameSession, "Game": game, "Title": "Wattamellon - How well do you know me?"}
 	response.Error = ""
 
 	// uncoment if i decide to make it an API
 	// json.NewEncoder(w).Encode(response)
 
-	temp, err := template.ParseFiles("internal/views/play.html")
+	temp, err := template.ParseFiles("internal/views/play.html", "internal/views/_head.html")
 
 	if err != nil {
-		fmt.Println("Unable to parse file")
+		fmt.Printf("Unable to parse file %v", err)
 	}
 
 	err = temp.Execute(w, response.Data)
-	
+
 	if err != nil {
-		fmt.Println("Unable to execute file")
+		fmt.Printf("Unable to execute file %v", err)
 	}
 }
 
@@ -420,7 +423,7 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not get game" ,err)
-		return 
+		return
 	}
 
 	defer rows.Close()
@@ -431,13 +434,13 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 		var gameSession GameSession
 
 		err := rows.Scan(
-		&gameSession.ID, 
-		&gameSession.GameID, 
+		&gameSession.ID,
+		&gameSession.GameID,
 		&gameSession.PlayerToken,
-		&gameSession.PlayerName, 
-		&gameSession.Answers, 
-		&gameSession.IsCompleted, 
-		&gameSession.SuccessRate, 
+		&gameSession.PlayerName,
+		&gameSession.Answers,
+		&gameSession.IsCompleted,
+		&gameSession.SuccessRate,
 		&gameSession.Created)
 
 		if err != nil {
@@ -447,7 +450,7 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 
 			json.NewEncoder(w).Encode(response)
 			fmt.Println("Could not create game" ,err)
-			return 
+			return
 		}
 
 		gameSessions = append(gameSessions, gameSession)
@@ -470,12 +473,13 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 		response.Error = fmt.Sprintf("error getting game %v", err)
 		response.Success = false
 		response.Data = nil
-		return 
+		return
 	}
 
 	response.Data = map[string]interface{}{
 		"Sessions": gameSessions,
 		"Game": game,
+		"Title": "Wattamellon - How well do you know me?",
 	}
 
 	response.Success = true
@@ -485,15 +489,15 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 	// json.NewEncoder(w).Encode(response)
 
 	// add the response to the template
-	temp, err := template.ParseFiles("internal/views/view.html")
+	temp, err := template.ParseFiles("internal/views/view.html", "internal/views/_head.html")
 
 	if err != nil {
-		fmt.Println("Unable to parse file")
+		fmt.Printf("Unable to parse file %v", err)
 	}
 
 	err = temp.Execute(w, response.Data)
-	
+
 	if err != nil {
-		fmt.Println("Unable to execute file")
+		fmt.Printf("Unable to execute file %v", err)
 	}
 }
