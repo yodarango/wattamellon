@@ -313,19 +313,58 @@ func SubmitGameSession(w http.ResponseWriter, r *http.Request) {
 // Renders index.html, the home page
 // this is the page where the user can create a new game
 func GetHomePage(w http.ResponseWriter, r *http.Request){
+	// Get the user token from the cookie
+	var lastGame Game
+	var templateData map[string]interface{}
+
+	userToken, err := r.Cookie("player_token")
+	if err == nil && userToken.Value != "" {
+		// Query the database for the last game created by this user
+		query := `SELECT id, name, player_name, size, thumbnail, creator_token, questions, created, is_complete
+				  FROM games
+				  WHERE creator_token = ?
+				  ORDER BY created DESC
+				  LIMIT 1;`
+
+		err := RouterConfig.DB.Conn.QueryRow(query, userToken.Value).Scan(
+			&lastGame.ID,
+			&lastGame.Name,
+			&lastGame.PlayerName,
+			&lastGame.Size,
+			&lastGame.Thumbnail,
+			&lastGame.CreatorToken,
+			&lastGame.Questions,
+			&lastGame.Created,
+			&lastGame.IsCompleted,
+		)
+
+		if err == nil {
+			// If we found a game, prepare the template data
+			templateData = map[string]interface{}{
+				"LastGame": lastGame,
+				"HasGame": true,
+			}
+		}
+	}
+
+	// If no game was found or there was an error, pass empty data
+	if templateData == nil {
+		templateData = map[string]interface{}{
+			"HasGame": false,
+		}
+	}
+
+	// Parse the template files
 	temp, err := template.ParseFiles("internal/views/index.html", "internal/views/_head.html")
-
 	if err != nil {
-		fmt.Printf("Unable to parse file %v", err)
+		fmt.Println("Unable to parse file:", err)
+		return
 	}
 
-	templateData := map[string]interface{}{
-		"Title": "Wattamellon - How well do you know me?",
-	}
+	// Execute the template with the data
 	err = temp.Execute(w, templateData)
-
 	if err != nil {
-		fmt.Printf("Unable to execute file %v", err)
+		fmt.Println("Unable to execute file:", err)
 	}
 }
 
@@ -383,22 +422,22 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Success = true
-	response.Data = map[string]interface{}{"Session": gameSession, "Game": game, "Title": "Wattamellon - How well do you know me?"}
+	response.Data = map[string]interface{}{"Session": gameSession, "Game": game}
 	response.Error = ""
 
 	// uncoment if i decide to make it an API
 	// json.NewEncoder(w).Encode(response)
 
-	temp, err := template.ParseFiles("internal/views/play.html", "internal/views/_head.html")
+	temp, err := template.ParseFiles("internal/views/play.html")
 
 	if err != nil {
-		fmt.Printf("Unable to parse file %v", err)
+		fmt.Println("Unable to parse file")
 	}
 
 	err = temp.Execute(w, response.Data)
 
 	if err != nil {
-		fmt.Printf("Unable to execute file %v", err)
+		fmt.Println("Unable to execute file")
 	}
 }
 
@@ -479,7 +518,6 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 	response.Data = map[string]interface{}{
 		"Sessions": gameSessions,
 		"Game": game,
-		"Title": "Wattamellon - How well do you know me?",
 	}
 
 	response.Success = true
@@ -489,15 +527,15 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 	// json.NewEncoder(w).Encode(response)
 
 	// add the response to the template
-	temp, err := template.ParseFiles("internal/views/view.html", "internal/views/_head.html")
+	temp, err := template.ParseFiles("internal/views/view.html")
 
 	if err != nil {
-		fmt.Printf("Unable to parse file %v", err)
+		fmt.Println("Unable to parse file")
 	}
 
 	err = temp.Execute(w, response.Data)
 
 	if err != nil {
-		fmt.Printf("Unable to execute file %v", err)
+		fmt.Println("Unable to execute file")
 	}
 }

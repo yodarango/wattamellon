@@ -161,6 +161,10 @@
     }
   }
 
+  function deleteGameState(name) {
+    localStorage.removeItem(name);
+  }
+
   function getUserToken() {
     return getCookie("player_token");
   }
