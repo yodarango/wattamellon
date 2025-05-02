@@ -45,7 +45,7 @@ type Game struct {
 	Questions    string   `json:"questions"`
 	Thumbnail string 	     `json:"thumbnail"`
 	Created      string    `json:"created"`
-	IsCompleted  bool      `json:"is_complete"`
+	IsCompleted  bool      `json:"is_completed"`
 }
 
 type GameSession struct {
@@ -383,13 +383,19 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
 	gameId := path[len(path) - 1]
 
+	playerToken, err := r.Cookie("player_token")
+
+	if err != nil {
+		fmt.Println("Could not get user token" ,err)
+	}
+
 	// w.Header().Set("Content-Type", "application/json")
 
-	query := `SELECT id, game_id, player_token, answers, is_completed, success_rate, created FROM game_sessions WHERE id = ?;`
+	query := `SELECT id, game_id, player_token, answers, is_completed, success_rate, created FROM game_sessions WHERE game_id = ? AND player_token = ? ORDER BY ID DESC LIMIT 1;`
 
-	row := RouterConfig.DB.Conn.QueryRow(query, gameId)
+	row := RouterConfig.DB.Conn.QueryRow(query, gameId, playerToken.Value)
 
-	err := row.Scan(
+	err = row.Scan(
 		&gameSession.ID,
 		&gameSession.GameID,
 		&gameSession.PlayerToken,
@@ -427,14 +433,23 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sessionJson, err := json.Marshal(gameSession)
+	if err != nil {
+		fmt.Printf("error marshalling game %v", err)
+	}
+
 	response.Success = true
-	response.Data = map[string]interface{}{"Session": gameSession, "Game": game}
+	response.Data = map[string]interface{}{
+		"SessionJson": sessionJson,
+		"Session": gameSession, 
+		"Game": game,
+	}
 	response.Error = ""
 
 	// uncoment if i decide to make it an API
 	// json.NewEncoder(w).Encode(response)
 
-	temp, err := template.ParseFiles("internal/views/play.html")
+	temp, err := template.ParseFiles("internal/views/play.html", "internal/views/_head.html")
 
 	if err != nil {
 		fmt.Println("Unable to parse file")

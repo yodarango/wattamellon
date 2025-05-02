@@ -11,11 +11,11 @@
         * it will reset the progress because the actual question property is not stored until
         * they submit the game
         **************************************************************************************** */
-        if (lastGame && lastGame.id > 0 && lastGame.is_complete) {
+        if (lastGame && lastGame.id > 0 && lastGame.is_completed) {
             lastGame.is_complete = true
             lastGame.is_submitted = true
           // Store it in localStorage with the key wattamellon_game
-          localStorage.setItem("wattamellon_game", JSON.stringify(lastGame));
+          updateGameState(lastGame, "wattamellon_game");
         }
 
     </script>
@@ -529,7 +529,7 @@
                 current_index: 0,
                 size: data.size,
                 name: data.name,
-              });
+              }, "wattamellon_game");
             }
             renderView("game");
           } else {
@@ -599,7 +599,7 @@
                 };
                 gameToken.current_index = currentIndex;
                 gameToken.is_complete = currentIndex >= categorieKeys.length;
-                updateGameState(gameToken);
+                updateGameState(gameToken, "wattamellon_game");
                 showNextQuestion();
               };
               optionsContainer.appendChild(card);
@@ -637,7 +637,10 @@
 
           const data = await res.json();
           if (data.success) {
-            updateGameState(data.data);
+            updateGameState({...data.data,
+                  is_complete: true,
+                  is_submitted: true,
+            }, "wattamellon_game");
 
             alert("Game submitted! You can now view the results.");
             renderView("submitted");

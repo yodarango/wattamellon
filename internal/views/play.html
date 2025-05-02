@@ -7,15 +7,311 @@
 </script>
 <!DOCTYPE html>
 <html lang="en">
+  <style>
+    #game-container,
+    #game-container-done,
+    #game-container-submitted {
+      display: none;
+    }
+
+    #start-game-session {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.6rem;
+      text-align: center;
+      padding: 2rem 0;
+      margin: 2rem auto 0;
+    }
+
+    #start-game-session h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    #start-game-session input {
+      width: 100%;
+      border: 1px solid var(--dr-delta);
+      border-radius: 2rem;
+      padding: 1.6rem;
+      display: block;
+    }
+
+    #start-game-session button {
+      background-color: var(--dr-delta);
+      color: var(--dr-alpha);
+      padding: 1.6rem 2rem;
+      border-radius: 2rem;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    #game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 2rem;
+      padding: 2rem 0;
+      margin: 2rem auto 0;
+    }
+
+    #game-container h4 {
+      font-size: 1.2rem;
+      color: var(--dr-alpha);
+      opacity: 0.7;
+      margin: 0;
+    }
+
+    #game-container h3 {
+      font-size: 1.8rem;
+      margin: 0.5rem 0 1.5rem;
+      max-width: 90%;
+    }
+
+    .options-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      width: 100%;
+    }
+
+    .option-card {
+      background-color: rgba(var(--dr-alpha-rgb), 0.2);
+      color: var(--dr-alpha);
+      border: 0.1rem solid rgba(var(--dr-alpha-rgb), 0.25);
+      border-radius: 2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--dr-spacing-4);
+      aspect-ratio: 1/1;
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+    }
+
+    .option-card:hover {
+      background-color: rgba(var(--dr-alpha-rgb), 0.4);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      scale: 0.9;
+      color: var(--dr-beta);
+      transform: translateY(-3px);
+      transition: 300ms;
+    }
+
+    #game-container-done {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.6rem;
+      text-align: center;
+      padding: 2rem 0;
+      margin: 2rem auto 0;
+    }
+
+    #game-container-done h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    #game-container-done button {
+      background-color: var(--dr-delta);
+      color: var(--dr-alpha);
+      padding: 1.6rem 2rem;
+      border-radius: 2rem;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    #game-container-submitted {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.6rem;
+      text-align: center;
+      padding: 2rem 0;
+      margin: 2rem auto 0;
+    }
+
+    #game-container-submitted h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    #game-results {
+      width: 100%;
+      margin-top: 2rem;
+    }
+
+    #game-results h3 {
+      margin: 1.5rem 0 1rem;
+    }
+
+    /* Score summary styles */
+    .score-summary {
+      background-color: var(--dr-gamma);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    /* Pie chart styles */
+    .pie-chart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+
+    .pie-chart {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+
+    .pie-chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-color {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+
+    .correct-color {
+      background-color: var(--dr-success, #4caf50);
+    }
+
+    .incorrect-color {
+      background-color: var(--dr-danger, #ff5252);
+    }
+
+    .legend-label {
+      font-size: 0.9rem;
+    }
+
+    /* Accordion styles */
+    .accordion-container {
+      width: 100%;
+    }
+
+    .accordion-item {
+      margin-bottom: 1rem;
+      border-radius: 1rem;
+    }
+
+    .accordion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      border-radius: 1rem;
+    }
+
+    .accordion-icon {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .accordion-plus {
+      display: inline-block;
+    }
+
+    .accordion-minus {
+      display: none;
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.2s ease;
+      padding: 0 1.5rem;
+
+      p {
+        text-align: left;
+      }
+    }
+
+    .accordion-item.active .accordion-content {
+      padding-bottom: 1rem;
+      max-height: 20rem;
+    }
+
+    .accordion-item.active .accordion-plus {
+      display: none;
+    }
+
+    .accordion-item.active .accordion-minus {
+      display: inline-block;
+    }
+
+    .accordion-item.correct {
+      background-color: rgba(0, 200, 0, 0.1);
+      border: 1px solid rgba(0, 200, 0, 0.3);
+    }
+
+    .accordion-item.incorrect {
+      background-color: rgba(255, 0, 0, 0.1);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+    }
+
+    .thumbnail {
+      width: 100%;
+      max-width: 20rem;
+      margin: auto;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+    }
+  </style>
   <head>
     {{template "head" .}}
+    <script>
+      const gameSession = {{.SessionJson}};
+
+       /* ****************************************************************************************
+       * Do not update the state with the last game if the session has not been submitted, otherwise
+       * it will reset the progress because the actual question property is not stored until
+       * they submit the game
+       **************************************************************************************** */
+       if (gameSession && gameSession.id > 0 && gameSession.is_completed) {
+           lastGame.is_complete = true
+           lastGame.is_submitted = true
+         // Store it in localStorage with the key wattamellon_game
+         updateGameState(gameSession, `wattamellon_game_session_${gameId}`);
+       }
+    </script>
   </head>
   <body>
     <main>
       <!-- The user is starting an existing game  -->
       <div id="start-game-session">
-        <h1>Start Playing {{.Game.Name}}</h1>
-        <p>Created by {{.Game.PlayerName}}</p>
+        <h1 class="mb-2">Start Playing {{.Game.Name}}</h1>
+        <p class="mb-4">Created by {{.Game.PlayerName}}</p>
         <input
           type="text"
           id="player_name"
@@ -24,7 +320,7 @@
         />
         <!-- Not allowing users to pick size for now -->
         <input type="hidden" id="gameId" value="{{.Game.ID}}" />
-        <button onclick="createGame()">Start Game</button>
+        <button onclick="createGameSession()">Start Game</button>
       </div>
 
       <!-- The user has already started the game but has not finished it yet -->
@@ -60,18 +356,11 @@
          * *****************************************************************************/
         document.addEventListener("DOMContentLoaded", () => {
           // Make sure gameId is available before checking localStorage
-          const gameId = document.getElementById("gameId").value;
-          if (!(gameId > 0)) {
-            renderView("create");
-            return;
-          }
-
-          const gameState = getGameStateFromLocalStorage(
+          const gameSessionState = getGameStateFromLocalStorage(
             `wattamellon_game_session_${gameId}`
           );
 
-          console.log(gameId);
-          if (gameState.game_id) {
+          if (gameSessionState.game_id) {
             if (gameState.is_submitted) {
               updateFinalResults();
 
@@ -79,7 +368,7 @@
               return;
             }
 
-            if (gameState.is_complete) {
+            if (gameSessionState.is_complete) {
               renderView("done");
               return;
             }
@@ -93,10 +382,10 @@
         /*************************************************************************************************
          * The new game session is created here. The user will be able to select the answers to the
          * **********************************************************************************************/
-        async function createGame() {
+        async function createGameSession() {
           const playerName = document.getElementById("player_name").value;
           const gameId = document.getElementById("gameId").value;
-          const playerToken = generateToken();
+          const playerToken = getUserToken();
 
           // alert the user if they have not selected a thumbnail or have not entered a name
           if (!playerName) {
@@ -128,17 +417,21 @@
           }, {});
 
           if (success) {
+            console.log("------", data);
             // update the game token with the order of the questions
-            updateGameState({
-              player_token: data.player_token,
-              game_id: data.game_id,
-              answers: emtpyAnswers,
-              is_complete: false,
-              current_index: 0,
-              success_rate: 0,
-              id: data.id,
-            });
-            renderView("game");
+            updateGameState(
+              {
+                player_token: data.player_token,
+                game_id: data.game_id,
+                answers: emtpyAnswers,
+                is_complete: false,
+                current_index: 0,
+                success_rate: 0,
+                id: data.id,
+              },
+              `wattamellon_game_session_${gameId}`
+            );
+            // renderView("game");
           } else {
             alert("Error creating game: " + data.error);
           }
@@ -212,7 +505,10 @@
                 };
                 gameState.current_index = currentIndex;
                 gameState.is_complete = currentIndex >= categorieKeys.length;
-                updateGameState(gameState);
+                updateGameState(
+                  gameState,
+                  `wattamellon_game_session_${gameId}`
+                );
                 showNextQuestion();
               };
               optionsContainer.appendChild(card);
@@ -274,11 +570,16 @@
 
           const data = await res.json();
           if (data.success) {
-            gameState.incorrect_answers = incorrectAnswers;
-            gameState.correct_answers = correctAnswers;
-            gameState.success_rate = successRate;
-            gameState.is_submitted = true;
-            updateGameState(gameState);
+            updateGameState(
+              {
+                ...data,
+                is_complete: true,
+                is_submitted: true,
+                correct_answers: correctAnswers,
+                incorrect_answers: incorrectAnswers,
+              },
+              `wattamellon_game_session_${gameId}`
+            );
 
             updateFinalResults();
 
