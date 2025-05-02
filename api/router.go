@@ -454,12 +454,62 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
 	gameId := path[len(path) - 1]
 
-
 	// w.Header().Set("Content-Type", "application/json")
 
-	query := `SELECT id, game_id, player_token, player_name, answers, is_completed, success_rate, created FROM game_sessions WHERE game_id = ?;`
+	userToken, err := r.Cookie("player_token")
 
-	rows, err := RouterConfig.DB.Conn.Query(query, gameId)
+	if err != nil {
+		fmt.Println("Could not get user token" ,err)
+	}
+
+	// users are limited to see their own games, fetch the creator token from this game 
+	// to compare it with the user token requeting the game
+	queryForCreatorToken := `SELECT creator_token FROM games WHERE id = ?;`
+	row := RouterConfig.DB.Conn.QueryRow(queryForCreatorToken, gameId)
+
+	var originalCreatorToken string
+
+	err = row.Scan(&originalCreatorToken)
+
+	if err != nil {
+		fmt.Println("Could not get game" ,err)
+	}
+
+	isAllowedToSeeThisGameId := userToken.Value == originalCreatorToken
+
+	queryForGame := `SELECT id, name, player_name, size, thumbnail, creator_token, questions, created, is_complete FROM games WHERE id = ?;`
+	queryFieldId := gameId
+
+	if (!isAllowedToSeeThisGameId) {
+		queryForGame = `SELECT id, name, player_name, size, thumbnail, creator_token, questions, created, is_complete FROM games WHERE creator_token = ? ORDER BY ID DESC LIMIT 1;`
+
+		queryFieldId = userToken.Value
+	}
+
+	row = RouterConfig.DB.Conn.QueryRow(queryForGame, queryFieldId)
+
+	err = row.Scan(
+		&game.ID,
+		&game.Name,
+		&game.PlayerName,
+		&game.Size,
+		&game.Thumbnail,
+		&game.CreatorToken,
+		&game.Questions,
+		&game.Created,
+		&game.IsCompleted)
+
+	if err != nil {
+		fmt.Println("Could not get game", err)
+		response.Error = fmt.Sprintf("error getting game %v", err)
+		response.Success = false
+		response.Data = nil
+		return
+	}
+
+	queryForGameSessions := `SELECT id, game_id, player_token, player_name, answers, is_completed, success_rate, created FROM game_sessions WHERE game_id = ?;`
+
+	rows, err := RouterConfig.DB.Conn.Query(queryForGameSessions, game.ID)
 
 	if err != nil {
 		response.Error = fmt.Sprintf("error getting game %v", err)
@@ -501,25 +551,7 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 		gameSessions = append(gameSessions, gameSession)
 	}
 
-	row := RouterConfig.DB.Conn.QueryRow(`SELECT name, player_name, size, thumbnail, creator_token, questions, created, is_complete FROM games WHERE id = ?;`, gameId)
-
-	err = row.Scan(
-		&game.Name,
-		&game.PlayerName,
-		&game.Size,
-		&game.Thumbnail,
-		&game.CreatorToken,
-		&game.Questions,
-		&game.Created,
-		&game.IsCompleted)
-
-	if err != nil {
-		fmt.Println("Could not get game", err)
-		response.Error = fmt.Sprintf("error getting game %v", err)
-		response.Success = false
-		response.Data = nil
-		return
-	}
+	
 
 	response.Data = map[string]interface{}{
 		"Sessions": gameSessions,
