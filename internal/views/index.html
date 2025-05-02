@@ -2,6 +2,21 @@
 <html lang="en">
   <head>
     {{template "head" .}}
+
+    <script>
+       const lastGame = {{.LastGameJson}};
+
+        /* ****************************************************************************************
+        * do not update the state with the last game if the game has not been submitted, otherwise
+        * it will reset the progress because the actual question property is not stored until
+        * they submit the game
+        **************************************************************************************** */
+        if (lastGame && lastGame.id > 0 && lastGame.is_submitted) {
+          // Store it in localStorage with the key wattamellon_game
+          localStorage.setItem("wattamellon_game", JSON.stringify(lastGame));
+        }
+
+    </script>
     <style>
       #game-container,
       #game-container-done,
@@ -302,7 +317,7 @@
         <button onclick="navigateToView()" class="btn-secondary w-100">See who has played</button>
       </div>
       <script>
-       
+
         /*************************************************************************************************
          * Four screens are possible:
          * 1. Create a game (default)
@@ -311,7 +326,7 @@
          * 4. Game is submitted (the user has submitted the game)
          * *****************************************************************************/
         document.addEventListener("DOMContentLoaded", () => {
-          const gameToken = getGameStateFromLocalStorage();
+          const gameToken = getGameStateFromLocalStorage("wattamellon_game");
           if (gameToken.game_id) {
             if (gameToken.is_submitted) {
               renderView("submitted");
@@ -428,7 +443,7 @@
          * Navigate to the view page
          * **********************************************************************************************/
         function navigateToView() {
-          const { game_id, creatorToken } = getGameStateFromLocalStorage("wattamellon_game");
+          const { game_id, creator_token } = getGameStateFromLocalStorage("wattamellon_game");
           window.location.href = "/view/" + game_id;
         }
 
@@ -436,7 +451,7 @@
          * Copy the game link to the clipboard so the user can share it
          * **********************************************************************************************/
         function shareGameLink(){
-            const { game_id, creatorToken } = getGameStateFromLocalStorage("wattamellon_game");
+            const { game_id, creator_token } = getGameStateFromLocalStorage("wattamellon_game");
             navigator.clipboard.writeText(window.location.origin + "/play/" + game_id);
             alert("Link copied!");
         }

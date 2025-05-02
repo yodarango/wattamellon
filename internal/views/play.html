@@ -67,7 +67,7 @@
           }
 
           const gameState = getGameStateFromLocalStorage(
-            `wattamellon_token_player_${gameId}`
+            `wattamellon_game_session_${gameId}`
           );
 
           console.log(gameId);
@@ -153,7 +153,7 @@
         function renderCards() {
           // get the game token from the local storage, so the state is preserved
           const gameState = getGameStateFromLocalStorage(
-            `wattamellon_token_player_${gameId}`
+            `wattamellon_game_session_${gameId}`
           );
           const categorieKeys = Object.keys(gameState.answers);
 
@@ -231,7 +231,7 @@
           // check that the user has answered all the questions
 
           const gameState = getGameStateFromLocalStorage(
-            `wattamellon_token_player_${gameId}`
+            `wattamellon_game_session_${gameId}`
           );
           const { player_token, id, answers } = gameState;
 
@@ -295,7 +295,7 @@
          * **********************************************************************************************/
         function updateFinalResults() {
           const gameState = getGameStateFromLocalStorage(
-            `wattamellon_token_player_${gameId}`
+            `wattamellon_game_session_${gameId}`
           );
           const { answers, success_rate, correct_answers, incorrect_answers } =
             gameState;

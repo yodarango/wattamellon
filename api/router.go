@@ -315,7 +315,7 @@ func SubmitGameSession(w http.ResponseWriter, r *http.Request) {
 func GetHomePage(w http.ResponseWriter, r *http.Request){
 	// Get the user token from the cookie
 	var lastGame Game
-	var templateData map[string]interface{}
+	var response HttpResponse
 
 	userToken, err := r.Cookie("player_token")
 	if err == nil && userToken.Value != "" {
@@ -338,21 +338,27 @@ func GetHomePage(w http.ResponseWriter, r *http.Request){
 			&lastGame.IsCompleted,
 		)
 
+		if err != nil {
+			fmt.Printf("No rows found: %v", err)
+		}
+
+		// lets go ahead and also send the data as a string to the template since it is much easier for JS to consume it
+
+		lastGameJson, err := json.Marshal(lastGame)
+		if err != nil {
+			fmt.Printf("error marshalling game %v", err)
+		}
+
 		if err == nil {
-			// If we found a game, prepare the template data
-			templateData = map[string]interface{}{
+			response.Data = map[string]interface{}{
+				"LastGameJson": string(lastGameJson),
 				"LastGame": lastGame,
-				"HasGame": true,
 			}
+			response.Success = true
+			response.Error = ""
 		}
 	}
 
-	// If no game was found or there was an error, pass empty data
-	if templateData == nil {
-		templateData = map[string]interface{}{
-			"HasGame": false,
-		}
-	}
 
 	// Parse the template files
 	temp, err := template.ParseFiles("internal/views/index.html", "internal/views/_head.html")
@@ -362,7 +368,7 @@ func GetHomePage(w http.ResponseWriter, r *http.Request){
 	}
 
 	// Execute the template with the data
-	err = temp.Execute(w, templateData)
+	err = temp.Execute(w, response.Data)
 	if err != nil {
 		fmt.Println("Unable to execute file:", err)
 	}
