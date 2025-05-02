@@ -194,6 +194,8 @@
         <h3 class="mb-4">Players</h3>
         <div class="accordion-container">
           {{range .Sessions}}
+          <!-- do not render sessions that have not been submitted -->
+          {{if lt .SuccessRate 101}}
           <div
             class="accordion-item {{if gt .SuccessRate 100}}none{{else if ge .SuccessRate 81}}correct{{else if ge .SuccessRate 51}}average{{else}}incorrect{{end}}"
             role="button"
@@ -245,7 +247,7 @@
               </script>
             </div>
           </div>
-          {{end}}
+          {{end}} {{end}}
         </div>
 
         {{else}}
