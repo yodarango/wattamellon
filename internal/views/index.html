@@ -7,11 +7,13 @@
        const lastGame = {{.LastGameJson}};
 
         /* ****************************************************************************************
-        * do not update the state with the last game if the game has not been submitted, otherwise
+        * Do not update the state with the last game if the game has not been submitted, otherwise
         * it will reset the progress because the actual question property is not stored until
         * they submit the game
         **************************************************************************************** */
-        if (lastGame && lastGame.id > 0 && lastGame.is_submitted) {
+        if (lastGame && lastGame.id > 0 && lastGame.is_complete) {
+            lastGame.is_complete = true
+            lastGame.is_submitted = true
           // Store it in localStorage with the key wattamellon_game
           localStorage.setItem("wattamellon_game", JSON.stringify(lastGame));
         }
@@ -327,7 +329,7 @@
          * *****************************************************************************/
         document.addEventListener("DOMContentLoaded", () => {
           const gameToken = getGameStateFromLocalStorage("wattamellon_game");
-          if (gameToken.game_id) {
+          if (gameToken.id) {
             if (gameToken.is_submitted) {
               renderView("submitted");
               return;
@@ -443,16 +445,16 @@
          * Navigate to the view page
          * **********************************************************************************************/
         function navigateToView() {
-          const { game_id, creator_token } = getGameStateFromLocalStorage("wattamellon_game");
-          window.location.href = "/view/" + game_id;
+          const { id, creator_token } = getGameStateFromLocalStorage("wattamellon_game");
+          window.location.href = "/view/" + id;
         }
 
         /*************************************************************************************************
          * Copy the game link to the clipboard so the user can share it
          * **********************************************************************************************/
         function shareGameLink(){
-            const { game_id, creator_token } = getGameStateFromLocalStorage("wattamellon_game");
-            navigator.clipboard.writeText(window.location.origin + "/play/" + game_id);
+            const { id, creator_token } = getGameStateFromLocalStorage("wattamellon_game");
+            navigator.clipboard.writeText(window.location.origin + "/play/" + id);
             alert("Link copied!");
         }
 
@@ -523,7 +525,7 @@
                 created: data.created,
                 is_complete: false,
                 is_submitted: false,
-                game_id: data.id,
+                id: data.id,
                 current_index: 0,
                 size: data.size,
                 name: data.name,
@@ -616,7 +618,7 @@
           // check that the user has answered all the questions
 
           const gameToken = getGameStateFromLocalStorage("wattamellon_game");
-          const { creator_token, game_id, questions, is_complete } = gameToken;
+          const { creator_token, id, questions, is_complete } = gameToken;
 
           if (!is_complete) {
             alert("Please answer all the questions before submitting");
@@ -626,7 +628,7 @@
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              id: game_id,
+              id,
               creator_token,
               questions: JSON.stringify(questions),
               is_completed: true,
@@ -635,8 +637,7 @@
 
           const data = await res.json();
           if (data.success) {
-            gameToken.is_submitted = true;
-            updateGameState(gameToken);
+            updateGameState(data.data);
 
             alert("Game submitted! You can now view the results.");
             renderView("submitted");
