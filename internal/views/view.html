@@ -66,6 +66,7 @@
       .accordion-item.active .accordion-content {
         padding-bottom: 1rem;
         max-height: 20rem;
+        overflow-y: scroll;
       }
 
       .accordion-item.active .accordion-plus {
@@ -172,6 +173,15 @@
     </script>
   </head>
   <body>
+    <header style="padding: 24px; display: flex; align-items: center">
+      <a href="/" style="display: block">
+        <img
+          src="/public/images/wattamellon.png"
+          alt="Wattamellon Logo"
+          style="height: 50px; width: auto"
+        />
+      </a>
+    </header>
     <main>
       <section class="mb-4">
         <h1 class="mb-4 text-center">Game sessions for {{.Game.Name}}</h1>
