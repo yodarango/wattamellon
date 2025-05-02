@@ -4,20 +4,19 @@
     {{template "head" .}}
 
     <script>
-       const lastGame = {{.LastGameJson}};
+      const lastGame = {{.LastGameJson}};
 
-        /* ****************************************************************************************
-        * Do not update the state with the last game if the game has not been submitted, otherwise
-        * it will reset the progress because the actual question property is not stored until
-        * they submit the game
-        ******************************************************************************************/
-        if (lastGame && lastGame.id > 0 && lastGame.is_completed) {
-            lastGame.is_complete = true
-            lastGame.is_submitted = true
-          // Store it in localStorage with the key wattamellon_game
-          updateGameState(lastGame, "wattamellon_game");
-        }
-
+       /* ****************************************************************************************
+       * Do not update the state with the last game if the game has not been submitted, otherwise
+       * it will reset the progress because the actual question property is not stored until
+       * they submit the game
+       ******************************************************************************************/
+       if (lastGame && lastGame.id > 0 && lastGame.is_completed) {
+           lastGame.is_complete = true
+           lastGame.is_submitted = true
+         // Store it in localStorage with the key wattamellon_game
+         updateGameState(lastGame, "wattamellon_game");
+       }
     </script>
     <style>
       #game-container,
@@ -73,194 +72,188 @@
       }
 
       .option-card:hover {
-        background-color:  rgba(var(--dr-alpha-rgb), 0.4);
+        background-color: rgba(var(--dr-alpha-rgb), 0.4);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        scale: .9;
+        scale: 0.9;
         color: var(--dr-beta);
         transform: translateY(-3px);
         transition: 300ms;
       }
 
       #create-form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1.6rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.6rem;
       }
 
       .thumbnail {
-            width: 100%;
-            max-width: 20rem;
-            margin: auto;
-            object-fit: contain;
-            object-position: center;
-            display: block;
+        width: 100%;
+        max-width: 20rem;
+        margin: auto;
+        object-fit: contain;
+        object-position: center;
+        display: block;
       }
 
       input {
-            width: 100%;
-            border: 1px solid var(--dr-delta);
-            border-radius: 2rem;
-            padding: 1.6rem;
-            display: block;
+        width: 100%;
+        border: 1px solid var(--dr-delta);
+        border-radius: 2rem;
+        padding: 1.6rem;
+        display: block;
       }
 
-      .btn-primary{
-            background-color: var(--dr-delta);
-            color: var(--dr-alpha);
-            padding: 1.6rem 2rem;
-            border-radius: 2rem;
-            border: none;
-            cursor: pointer;
+      .btn-primary {
+        background-color: var(--dr-delta);
+        color: var(--dr-alpha);
+        padding: 1.6rem 2rem;
+        border-radius: 2rem;
+        border: none;
+        cursor: pointer;
       }
 
-      .btn-secondary{
-            background-color: rgba(var(--dr-alpha-rgb), 0.2);
-            color: var(--dr-alpha);
-            display: block;
-            padding: 1.6rem 2rem;
-            border-radius: 2rem;
-            border: .1rem solid rgba(var(--dr-alpha-rgb), 0.25);
-            cursor: pointer;
+      .btn-secondary {
+        background-color: rgba(var(--dr-alpha-rgb), 0.2);
+        color: var(--dr-alpha);
+        display: block;
+        padding: 1.6rem 2rem;
+        border-radius: 2rem;
+        border: 0.1rem solid rgba(var(--dr-alpha-rgb), 0.25);
+        cursor: pointer;
       }
-
 
       #avatar-dialog {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(var(--dr-delta-rgb), 0.5);
-            z-index: 1000;
-            overflow-y: auto;
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(var(--dr-delta-rgb), 0.5);
+        z-index: 1000;
+        overflow-y: auto;
       }
 
       .dialog-content {
-            background-color: var(--dr-beta);
-            margin: 10% auto;
-            padding: 0;
-            border-radius: 1rem;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: hidden;
-            display: flex;
-            flex-direction: column;
-            position: relative;
+        background-color: var(--dr-beta);
+        margin: 10% auto;
+        padding: 0;
+        border-radius: 1rem;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
       }
 
       .dialog-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background-color: var(--dr-beta);
-            border-bottom: 1px solid var(--dr-omicron);
-            position: sticky;
-            top: 0;
-            z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background-color: var(--dr-beta);
+        border-bottom: 1px solid var(--dr-omicron);
+        position: sticky;
+        top: 0;
+        z-index: 10;
       }
 
       .close-button {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
       }
 
       .avatars-container {
-            padding: 1rem 2rem;
-            overflow-y: auto;
-            max-height: calc(80vh - 120px);
+        padding: 1rem 2rem;
+        overflow-y: auto;
+        max-height: calc(80vh - 120px);
       }
 
       .avatars-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
       }
 
       .avatar-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s;
       }
 
       .avatar-item:hover {
-            background-color: var(--dr-gamma);
+        background-color: var(--dr-gamma);
       }
 
       .avatar-item img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            margin-bottom: 0.5rem;
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        margin-bottom: 0.5rem;
       }
 
       .avatar-item p {
-            font-size: 0.8rem;
-            text-align: center;
-            margin: 0;
+        font-size: 0.8rem;
+        text-align: center;
+        margin: 0;
       }
 
       .load-more-container {
-            padding: 1rem;
-            background-color: var(--dr-beta);
-            border-top: 1px solid var(--dr-omicron);
-            position: sticky;
-            bottom: 0;
-            z-index: 10;
+        padding: 1rem;
+        background-color: var(--dr-beta);
+        border-top: 1px solid var(--dr-omicron);
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
       }
 
       .load-more {
-            display: block;
-            margin: 0 auto;
-            padding: 0.8rem 1.5rem;
-            background-color: var(--dr-delta);
-            color: var(--dr-alpha);
-            border: none;
-            border-radius: 1rem;
-            cursor: pointer;
-            width: 100%;
-            max-width: 200px;
+        display: block;
+        margin: 0 auto;
+        padding: 0.8rem 1.5rem;
+        background-color: var(--dr-delta);
+        color: var(--dr-alpha);
+        border: none;
+        border-radius: 1rem;
+        cursor: pointer;
+        width: 100%;
+        max-width: 200px;
       }
 
       .selected-avatar {
-            background-color: var(--dr-gamma);
+        background-color: var(--dr-gamma);
       }
 
       #selected_avatar_display {
-            display: none;
-            background-color: rgba(var(--dr-delta-rgb), 0.4);
-            padding: var(--dr-spacing-4);
-            border: .1rem solid var(--dr-delta);
-            border-radius: 2rem;
+        display: none;
+        background-color: rgba(var(--dr-delta-rgb), 0.4);
+        padding: var(--dr-spacing-4);
+        border: 0.1rem solid var(--dr-delta);
+        border-radius: 2rem;
 
-            img {
-                  width: 100%;
-                  max-width: 10rem;
-                  object-fit: contain;
-                  object-position: center;
-            }
+        img {
+          width: 100%;
+          max-width: 10rem;
+          object-fit: contain;
+          object-position: center;
+        }
       }
 
-      #game-container-done{
-            margin: 5rem auto 0;
+      #game-container-done {
+        margin: 5rem auto 0;
       }
     </style>
-
-    <script src="/public/categories_db.js"></script>
-    <script src="/public/avatars-data.js"></script>
-    <link       rel="stylesheet"
-      type="text/css" href="/public/app.css"></link>
   </head>
   <body>
     <main>
@@ -273,10 +266,20 @@
         <!-- Not allowing users to pick size for now -->
         <input type="hidden" id="size" value="50" />
         <input type="hidden" id="selected_avatar" name="thumbnail" value="" />
-        <div id="selected_avatar_display" class="align-items-center justify-content-start gap-4 w-100">
-        </div>
-        <button type="button" onclick="openAvatarDialog()" class="btn-secondary w-100">Select Avatar</button>
-        <button onclick="createGame()" class="btn-primary w-100">Save Game</button>
+        <div
+          id="selected_avatar_display"
+          class="align-items-center justify-content-start gap-4 w-100"
+        ></div>
+        <button
+          type="button"
+          onclick="openAvatarDialog()"
+          class="btn-secondary w-100"
+        >
+          Select Avatar
+        </button>
+        <button onclick="createGame()" class="btn-primary w-100">
+          Save Game
+        </button>
 
         <!-- Avatar Selection Dialog -->
         <div id="avatar-dialog">
@@ -284,7 +287,7 @@
             <div class="dialog-header">
               <h3>Select an Avatar</h3>
               <button class="close-button p-0" onclick="closeAvatarDialog()">
-                  <ion-icon name="close-outline"></ion-icon>
+                <ion-icon name="close-outline"></ion-icon>
               </button>
             </div>
             <div class="avatars-container">
@@ -293,7 +296,13 @@
               </div>
             </div>
             <div class="load-more-container">
-              <button id="load-more-btn" class="load-more" onclick="loadMoreAvatars()">Load More</button>
+              <button
+                id="load-more-btn"
+                class="load-more"
+                onclick="loadMoreAvatars()"
+              >
+                Load More
+              </button>
             </div>
           </div>
         </div>
@@ -304,22 +313,27 @@
 
       <!-- this is the finished game session -->
       <div id="game-container-done">
-         <h2 class="text-center mb-4">Great, you're done</h2>
-         <img src="/public/images/thank_you_4000.webp" class="thumbnail" />
-         <button onclick="submitGame()" class="btn-primary w-100" >Submit Answers</button>
+        <h2 class="text-center mb-4">Great, you're done</h2>
+        <img src="/public/images/thank_you_4000.webp" class="thumbnail" />
+        <button onclick="submitGame()" class="btn-primary w-100">
+          Submit Answers
+        </button>
       </div>
 
       <!-- The game has been submitted. There is nothing else to see here  -->
       <div id="game-container-submitted">
         <h2 class="text-center mb-4">Game Submitted!</h2>
-         <img src="/public/images/search_4000.webp" class="thumbnail" />
-         <p>Find out who knows you best!</p>
-        <button onclick="shareGameLink()" class="btn-primary w-100 mb-4">Share Game Link</button>
-         <p>You can also see who has answered your questions.</p>
-        <button onclick="navigateToView()" class="btn-secondary w-100">See who has played</button>
+        <img src="/public/images/search_4000.webp" class="thumbnail" />
+        <p>Find out who knows you best!</p>
+        <button onclick="shareGameLink()" class="btn-primary w-100 mb-4">
+          Share Game Link
+        </button>
+        <p>You can also see who has answered your questions.</p>
+        <button onclick="navigateToView()" class="btn-secondary w-100">
+          See who has played
+        </button>
       </div>
       <script>
-
         /*************************************************************************************************
          * Four screens are possible:
          * 1. Create a game (default)
@@ -350,42 +364,47 @@
         const avatarsPerPage = 10;
         let selectedAvatar = null;
 
-      /* **********************************************************************************
-       * Avatar selection functions
-       * **********************************************************************************/
+        /* **********************************************************************************
+         * Avatar selection functions
+         * **********************************************************************************/
         function openAvatarDialog() {
-          document.getElementById('avatar-dialog').style.display = 'block';
+          document.getElementById("avatar-dialog").style.display = "block";
 
           // Load initial avatars if not already loaded
-          if (document.getElementById('avatars-container').children.length === 0) {
+          if (
+            document.getElementById("avatars-container").children.length === 0
+          ) {
             loadMoreAvatars();
           }
         }
 
         function closeAvatarDialog() {
-          document.getElementById('avatar-dialog').style.display = 'none';
+          document.getElementById("avatar-dialog").style.display = "none";
         }
 
-      /* **********************************************************************************
-       * creates html elements for the avatars "load more."
-       * **********************************************************************************/
+        /* **********************************************************************************
+         * creates html elements for the avatars "load more."
+         * **********************************************************************************/
         function loadMoreAvatars() {
-          const container = document.getElementById('avatars-container');
-          const loadMoreBtn = document.getElementById('load-more-btn');
+          const container = document.getElementById("avatars-container");
+          const loadMoreBtn = document.getElementById("load-more-btn");
 
           // Calculate end index for this batch
-          const endIndex = Math.min(currentAvatarIndex + avatarsPerPage, avatarsData.length);
+          const endIndex = Math.min(
+            currentAvatarIndex + avatarsPerPage,
+            avatars.length
+          );
 
           // Load avatars for this batch
           for (let i = currentAvatarIndex; i < endIndex; i++) {
-            const avatar = avatarsData[i];
-            const avatarElement = document.createElement('div');
-            avatarElement.className = 'avatar-item';
+            const avatar = avatars[i];
+            const avatarElement = document.createElement("div");
+            avatarElement.className = "avatar-item";
             avatarElement.dataset.file = avatar.file;
 
             // Add selected class if this is the currently selected avatar
             if (selectedAvatar === avatar.file) {
-              avatarElement.classList.add('selected-avatar');
+              avatarElement.classList.add("selected-avatar");
             }
 
             avatarElement.innerHTML = `
@@ -393,7 +412,7 @@
               <p>${avatar.name}</p>
             `;
 
-            avatarElement.addEventListener('click', function() {
+            avatarElement.addEventListener("click", function () {
               selectAvatar(avatar.file, avatar.name);
             });
 
@@ -404,36 +423,36 @@
           currentAvatarIndex = endIndex;
 
           // Hide load more button if all avatars are loaded
-          if (currentAvatarIndex >= avatarsData.length) {
-            loadMoreBtn.style.display = 'none';
+          if (currentAvatarIndex >= avatars.length) {
+            loadMoreBtn.style.display = "none";
           }
         }
 
-      /* **********************************************************************************
-       * Select an avatar and add the value to the hidden input
-       * **********************************************************************************/
+        /* **********************************************************************************
+         * Select an avatar and add the value to the hidden input
+         * **********************************************************************************/
         function selectAvatar(file, name) {
           // Update selected avatar
           selectedAvatar = file;
 
           // Update hidden input value
-          document.getElementById('selected_avatar').value = file;
+          document.getElementById("selected_avatar").value = file;
 
           // Update display
-          const display = document.getElementById('selected_avatar_display');
-          display.style.display = 'flex';
+          const display = document.getElementById("selected_avatar_display");
+          display.style.display = "flex";
           display.innerHTML = `
             <img src="/public/images/avatars/${file}" alt="${name}">
             <h2 class="m-0">${name}</h2>
           `;
 
           // Update selected class in dialog
-          const avatarItems = document.querySelectorAll('.avatar-item');
-          avatarItems.forEach(item => {
+          const avatarItems = document.querySelectorAll(".avatar-item");
+          avatarItems.forEach((item) => {
             if (item.dataset.file === file) {
-              item.classList.add('selected-avatar');
+              item.classList.add("selected-avatar");
             } else {
-              item.classList.remove('selected-avatar');
+              item.classList.remove("selected-avatar");
             }
           });
 
@@ -445,17 +464,19 @@
          * Navigate to the view page
          * **********************************************************************************************/
         function navigateToView() {
-          const { id, creator_token } = getGameStateFromLocalStorage("wattamellon_game");
+          const { id, creator_token } =
+            getGameStateFromLocalStorage("wattamellon_game");
           window.location.href = "/view/" + id;
         }
 
         /*************************************************************************************************
          * Copy the game link to the clipboard so the user can share it
          * **********************************************************************************************/
-        function shareGameLink(){
-            const { id, creator_token } = getGameStateFromLocalStorage("wattamellon_game");
-            navigator.clipboard.writeText(window.location.origin + "/play/" + id);
-            alert("Link copied!");
+        function shareGameLink() {
+          const { id, creator_token } =
+            getGameStateFromLocalStorage("wattamellon_game");
+          navigator.clipboard.writeText(window.location.origin + "/play/" + id);
+          alert("Link copied!");
         }
 
         /*************************************************************************************************
@@ -518,18 +539,21 @@
           if (success) {
             // update the game token with the order of the questions
             if (!(Object.keys(gameToken.questions || {}) > 0)) {
-              updateGameState({
-                creator_token: data.creator_token,
-                questions: emtpyQuestions,
-                thumbnail: data.thumbnail,
-                created: data.created,
-                is_complete: false,
-                is_submitted: false,
-                id: data.id,
-                current_index: 0,
-                size: data.size,
-                name: data.name,
-              }, "wattamellon_game");
+              updateGameState(
+                {
+                  creator_token: data.creator_token,
+                  questions: emtpyQuestions,
+                  thumbnail: data.thumbnail,
+                  created: data.created,
+                  is_complete: false,
+                  is_submitted: false,
+                  id: data.id,
+                  current_index: 0,
+                  size: data.size,
+                  name: data.name,
+                },
+                "wattamellon_game"
+              );
             }
             renderView("game");
           } else {
@@ -637,10 +661,10 @@
 
           const data = await res.json();
           if (data.success) {
-            updateGameState({...data.data,
-                  is_complete: true,
-                  is_submitted: true,
-            }, "wattamellon_game");
+            updateGameState(
+              { ...data.data, is_complete: true, is_submitted: true },
+              "wattamellon_game"
+            );
 
             alert("Game submitted! You can now view the results.");
             renderView("submitted");
@@ -696,7 +720,6 @@
               break;
           }
         }
-
       </script>
     </main>
   </body>

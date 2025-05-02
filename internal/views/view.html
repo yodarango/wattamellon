@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-        {{template "head" .}}
+    {{template "head" .}}
     <style>
       #game-container,
       #game-container-done,
@@ -58,8 +58,8 @@
         transition: max-height 0.2s ease;
         padding: 0 1.5rem;
 
-        p{
-            text-align: left;
+        p {
+          text-align: left;
         }
       }
 
@@ -93,83 +93,79 @@
         background-color: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.3);
       }
-      
-      .btn-danger{
-            background-color: var(--dr-danger);
-            color: var(--dr-alpha);
-            padding: 1.6rem 2rem;
-            border-radius: 2rem;
-            border: none;
-            cursor: pointer;
-            width: 100%;
+
+      .btn-danger {
+        background-color: var(--dr-danger);
+        color: var(--dr-alpha);
+        padding: 1.6rem 2rem;
+        border-radius: 2rem;
+        border: none;
+        cursor: pointer;
+        width: 100%;
       }
 
-      .thumbnail{
-            width: 100%;
-            max-width: 20rem;
-            object-fit: contain;
-            object-position: center;
-            display: block;
+      .thumbnail {
+        width: 100%;
+        max-width: 20rem;
+        object-fit: contain;
+        object-position: center;
+        display: block;
       }
 
       /* nested accordion */
-      .accordion-item-nested{
-            padding: var(--dr-spacing-2);
+      .accordion-item-nested {
+        padding: var(--dr-spacing-2);
 
-            .accordion-header-nested{
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  cursor: pointer;
-                  transition: background-color 0.2s;
-                  border-radius: 1rem;
-            }
+        .accordion-header-nested {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          cursor: pointer;
+          transition: background-color 0.2s;
+          border-radius: 1rem;
+        }
 
-            .accordion-icon-nested{
-                  font-size: 1.5rem;
-                  font-weight: bold;
-            }
-            .accordion-plus-nested{
-                  display: inline-block;
-            }
-            .accordion-minus-nested{
-                  display: none;
-            }
-            .accordion-content-nested{
-                  display: none;
-                  max-height: 20rem;
-                  overflow-y: scroll;
-                  transition: max-height 0.2s ease;
-                  padding: 0 1.5rem;
+        .accordion-icon-nested {
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+        .accordion-plus-nested {
+          display: inline-block;
+        }
+        .accordion-minus-nested {
+          display: none;
+        }
+        .accordion-content-nested {
+          display: none;
+          max-height: 20rem;
+          overflow-y: scroll;
+          transition: max-height 0.2s ease;
+          padding: 0 1.5rem;
 
-                  p{
-                        text-align: left;
-                  }
-            }
-            &.active .accordion-content-nested {
-                  display: block
-            }
-            &.active .accordion-plus-nested {
-                  display: none;
-            }
-            &.active .accordion-minus-nested {
-                  display: inline-block;
-            }
-            .question{
-                  text-align: left;
-            }
-            .answer-correct{
-                  color: var(--dr-success);
-            }
-            .answer-incorrect{
-                  color: var(--dr-danger);
-            }
+          p {
+            text-align: left;
+          }
+        }
+        &.active .accordion-content-nested {
+          display: block;
+        }
+        &.active .accordion-plus-nested {
+          display: none;
+        }
+        &.active .accordion-minus-nested {
+          display: inline-block;
+        }
+        .question {
+          text-align: left;
+        }
+        .answer-correct {
+          color: var(--dr-success);
+        }
+        .answer-incorrect {
+          color: var(--dr-danger);
+        }
       }
     </style>
-
-    <script src="/public/categories_db.js"></script>
-    <link href="/public/app.css" rel="stylesheet"
-      type="text/css"></link>
     <script>
       // set the answers of this user
       const yourAnswers = {{.Game.Questions}};
@@ -178,11 +174,17 @@
   <body>
     <main>
       <section class="mb-4">
-            <h1 class="mb-4 text-center">Game sessions for {{.Game.Name}}</h1>
-            <img src="/public/images/avatars/{{.Game.Thumbnail}}" alt="{{.Game.Name}}" class="thumbnail mb-4 d-block mx-auto" />
-            <input type="text" value="" id="gameLink" readonly class="d-none" />
-            <button onclick="copyLink()" class="btn-primary w-100 mb-2">Share Game Link</button>
-            <!-- <button onclick="deleteGame()" class="btn-danger w-100">Delete Game</button> -->
+        <h1 class="mb-4 text-center">Game sessions for {{.Game.Name}}</h1>
+        <img
+          src="/public/images/avatars/{{.Game.Thumbnail}}"
+          alt="{{.Game.Name}}"
+          class="thumbnail mb-4 d-block mx-auto"
+        />
+        <input type="text" value="" id="gameLink" readonly class="d-none" />
+        <button onclick="copyLink()" class="btn-primary w-100 mb-2">
+          Share Game Link
+        </button>
+        <!-- <button onclick="deleteGame()" class="btn-danger w-100">Delete Game</button> -->
       </section>
 
       <!-- dummy div for varaible data storage since it is much easier to parse with JS -->
@@ -191,58 +193,65 @@
         {{if .Sessions}}
         <h3 class="mb-4">Players</h3>
         <div class="accordion-container">
-        {{range .Sessions}}
-        <div class="accordion-item {{if gt .SuccessRate 100}}none{{else if ge .SuccessRate 81}}correct{{else if ge .SuccessRate 51}}average{{else}}incorrect{{end}}" role="button">
+          {{range .Sessions}}
+          <div
+            class="accordion-item {{if gt .SuccessRate 100}}none{{else if ge .SuccessRate 81}}correct{{else if ge .SuccessRate 51}}average{{else}}incorrect{{end}}"
+            role="button"
+          >
             <div class="accordion-header" onclick="toggleAccordion(this)">
-                  <div>
-                        <h4>Player: {{.PlayerName}}</h4>
-                        <h5>Score: {{.SuccessRate}}%</h5>
-                  </div>
-                  <div class="accordion-icon">
-                        <span class="accordion-plus">+</span><span class="accordion-minus">−</span></div>
+              <div>
+                <h4>Player: {{.PlayerName}}</h4>
+                <h5>Score: {{.SuccessRate}}%</h5>
+              </div>
+              <div class="accordion-icon">
+                <span class="accordion-plus">+</span
+                ><span class="accordion-minus">−</span>
+              </div>
             </div>
             <div>
-                  <div id="player-results-{{.ID}}" class="results-display accordion-content"></div>
-                  <script>
-                        Object.keys(yourAnswers).forEach((key) => {
-                              const question = categories[key]["question"];
-                              const yourSelection =
-                              categories[key]["options"][yourAnswers[key].selection];
-                        const playerAnswer = categories[key]["options"][{{.Answers}}[key]?.selection];
+              <div
+                id="player-results-{{.ID}}"
+                class="results-display accordion-content"
+              ></div>
+              <script>
+                Object.keys(yourAnswers).forEach((key) => {
+                      const question = categories[key]["question"];
+                      const yourSelection =
+                      categories[key]["options"][yourAnswers[key].selection];
+                const playerAnswer = categories[key]["options"][{{.Answers}}[key]?.selection];
 
-                        const resultsDisplay = document.querySelector(
-                              `#player-results-{{.ID}}.results-display`
-                        );
+                const resultsDisplay = document.querySelector(
+                      `#player-results-{{.ID}}.results-display`
+                );
 
-                        resultsDisplay.innerHTML += `
-                        <div class="accordion-item-nested">
-                              <div class="accordion-header-nested" onclick="toggleAccordionNested(this)">
-                                    <p class="question ${ {{.Answers}}[key]?.isCorrect ? "answer-correct" : "answer-incorrect" }">
-                                          ${question}
-                                    </p>
-                                    <div class="accordion-icon-nested">
-                                          <span class="accordion-plus-nested">+</span>
-                                          <span class="accordion-minus-nested">−</span>
-                                    </div>
-                              </div>
-                              <div class="accordion-content-nested">
-                                    <p>Your answer: ${yourSelection || "None"}</p>
-                                    <p>Their answer: ${playerAnswer || "None"}</p>
-                              </div>
-                        </div>
-                        `;
-                        });
-                  </script>
+                resultsDisplay.innerHTML += `
+                <div class="accordion-item-nested">
+                      <div class="accordion-header-nested" onclick="toggleAccordionNested(this)">
+                            <p class="question ${ {{.Answers}}[key]?.isCorrect ? "answer-correct" : "answer-incorrect" }">
+                                  ${question}
+                            </p>
+                            <div class="accordion-icon-nested">
+                                  <span class="accordion-plus-nested">+</span>
+                                  <span class="accordion-minus-nested">−</span>
+                            </div>
+                      </div>
+                      <div class="accordion-content-nested">
+                            <p>Your answer: ${yourSelection || "None"}</p>
+                            <p>Their answer: ${playerAnswer || "None"}</p>
+                      </div>
+                </div>
+                `;
+                });
+              </script>
             </div>
-        </div>
-        {{end}}
+          </div>
+          {{end}}
         </div>
 
         {{else}}
         <p class="text-center">No players have played this game yet.</p>
         {{end}}
       </div>
-    
 
       <script>
         const gameId = window.location.pathname.split("/").pop();
@@ -255,20 +264,20 @@
         }
 
         function deleteGame() {
-      //     localStorage.removeItem("wattamellon_game");
-      //     window.location.href = "/";
+          //     localStorage.removeItem("wattamellon_game");
+          //     window.location.href = "/";
         }
       </script>
     </main>
     <script>
       function toggleAccordion(element) {
-            element.parentElement.classList.toggle("active");
+        element.parentElement.classList.toggle("active");
       }
 
       function toggleAccordionNested(element) {
-            // get the next sibling
-            // element.stopPropagation();
-            element.parentElement.classList.toggle("active");
+        // get the next sibling
+        // element.stopPropagation();
+        element.parentElement.classList.toggle("active");
       }
     </script>
   </body>
