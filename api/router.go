@@ -385,15 +385,19 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 
 	playerToken, err := r.Cookie("player_token")
 
-	if err != nil {
-		fmt.Println("Could not get user token" ,err)
+	// Default to empty string if cookie is not present
+	playerTokenValue := ""
+	if err == nil && playerToken != nil {
+		playerTokenValue = playerToken.Value
+	} else {
+		fmt.Println("Could not get user token", err)
 	}
 
 	// w.Header().Set("Content-Type", "application/json")
 
 	query := `SELECT id, game_id, player_token, answers, is_completed, success_rate, created FROM game_sessions WHERE game_id = ? AND player_token = ? ORDER BY ID DESC LIMIT 1;`
 
-	row := RouterConfig.DB.Conn.QueryRow(query, gameId, playerToken.Value)
+	row := RouterConfig.DB.Conn.QueryRow(query, gameId, playerTokenValue)
 
 	err = row.Scan(
 		&gameSession.ID,
@@ -433,15 +437,18 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sessionJson, err := json.Marshal(gameSession)
-	if err != nil {
-		fmt.Printf("error marshalling game %v", err)
+	var sessionJson []byte
+	if gameSession.ID != 0 {
+		sessionJson, err = json.Marshal(gameSession)
+		if err != nil {
+			fmt.Printf("error marshalling game %v", err)
+		}
 	}
 
 	response.Success = true
 	response.Data = map[string]interface{}{
-		"SessionJson": sessionJson,
-		"Session": gameSession, 
+		"SessionJson": string(sessionJson),
+		"Session": gameSession,
 		"Game": game,
 	}
 	response.Error = ""
@@ -473,11 +480,15 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 
 	userToken, err := r.Cookie("player_token")
 
-	if err != nil {
-		fmt.Println("Could not get user token" ,err)
+	// Default to empty string if cookie is not present
+	userTokenValue := ""
+	if err == nil && userToken != nil {
+		userTokenValue = userToken.Value
+	} else {
+		fmt.Println("Could not get user token", err)
 	}
 
-	// users are limited to see their own games, fetch the creator token from this game 
+	// users are limited to see their own games, fetch the creator token from this game
 	// to compare it with the user token requeting the game
 	queryForCreatorToken := `SELECT creator_token FROM games WHERE id = ?;`
 	row := RouterConfig.DB.Conn.QueryRow(queryForCreatorToken, gameId)
@@ -487,10 +498,10 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 	err = row.Scan(&originalCreatorToken)
 
 	if err != nil {
-		fmt.Println("Could not get game" ,err)
+		fmt.Println("Could not get game", err)
 	}
 
-	isAllowedToSeeThisGameId := userToken.Value == originalCreatorToken
+	isAllowedToSeeThisGameId := userTokenValue == originalCreatorToken
 
 	queryForGame := `SELECT id, name, player_name, size, thumbnail, creator_token, questions, created, is_complete FROM games WHERE id = ?;`
 	queryFieldId := gameId
@@ -498,7 +509,7 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 	if (!isAllowedToSeeThisGameId) {
 		queryForGame = `SELECT id, name, player_name, size, thumbnail, creator_token, questions, created, is_complete FROM games WHERE creator_token = ? ORDER BY ID DESC LIMIT 1;`
 
-		queryFieldId = userToken.Value
+		queryFieldId = userTokenValue
 	}
 
 	row = RouterConfig.DB.Conn.QueryRow(queryForGame, queryFieldId)
@@ -566,7 +577,7 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 		gameSessions = append(gameSessions, gameSession)
 	}
 
-	
+
 
 	response.Data = map[string]interface{}{
 		"Sessions": gameSessions,
