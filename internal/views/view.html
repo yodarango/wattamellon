@@ -182,7 +182,7 @@
             <img src="/public/images/avatars/{{.Game.Thumbnail}}" alt="{{.Game.Name}}" class="thumbnail mb-4 d-block mx-auto" />
             <input type="text" value="" id="gameLink" readonly class="d-none" />
             <button onclick="copyLink()" class="btn-primary w-100 mb-2">Share Game Link</button>
-            <button onclick="deleteGame()" class="btn-danger w-100">Delete Game</button>
+            <!-- <button onclick="deleteGame()" class="btn-danger w-100">Delete Game</button> -->
       </section>
 
       <!-- dummy div for varaible data storage since it is much easier to parse with JS -->
@@ -255,8 +255,8 @@
         }
 
         function deleteGame() {
-          localStorage.removeItem("wattamellon_game");
-          window.location.href = "/";
+      //     localStorage.removeItem("wattamellon_game");
+      //     window.location.href = "/";
         }
       </script>
     </main>
