@@ -121,7 +121,7 @@
   function updateGameState(token, name) {
     const currentToken = localStorage.getItem(name);
     token = { ...JSON.parse(currentToken || "{}"), ...token };
-    localStorage.setItem("wattamellon_game", JSON.stringify(token));
+    localStorage.setItem(name, JSON.stringify(token));
   }
 
   /*************************************************************************************************

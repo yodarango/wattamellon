@@ -356,12 +356,16 @@
          * *****************************************************************************/
         document.addEventListener("DOMContentLoaded", () => {
           // Make sure gameId is available before checking localStorage
+          const gameId = document.getElementById("gameId").value;
+
           const gameSessionState = getGameStateFromLocalStorage(
             `wattamellon_game_session_${gameId}`
           );
 
+          console.log("gameSessionState", gameSessionState);
+
           if (gameSessionState.game_id) {
-            if (gameState.is_submitted) {
+            if (gameSessionState.is_submitted) {
               updateFinalResults();
 
               renderView("submitted");
@@ -417,7 +421,6 @@
           }, {});
 
           if (success) {
-            console.log("------", data);
             // update the game token with the order of the questions
             updateGameState(
               {
@@ -431,7 +434,7 @@
               },
               `wattamellon_game_session_${gameId}`
             );
-            // renderView("game");
+            renderView("game");
           } else {
             alert("Error creating game: " + data.error);
           }

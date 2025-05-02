@@ -10,7 +10,7 @@
         * Do not update the state with the last game if the game has not been submitted, otherwise
         * it will reset the progress because the actual question property is not stored until
         * they submit the game
-        **************************************************************************************** */
+        ******************************************************************************************/
         if (lastGame && lastGame.id > 0 && lastGame.is_completed) {
             lastGame.is_complete = true
             lastGame.is_submitted = true
