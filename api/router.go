@@ -530,7 +530,6 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 		response.Error = fmt.Sprintf("error getting game %v", err)
 		response.Success = false
 		response.Data = nil
-		return
 	}
 
 	queryForGameSessions := `SELECT id, game_id, player_token, player_name, answers, is_completed, success_rate, created FROM game_sessions WHERE game_id = ?;`
@@ -544,7 +543,6 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 
 		json.NewEncoder(w).Encode(response)
 		fmt.Println("Could not get game" ,err)
-		return
 	}
 
 	defer rows.Close()

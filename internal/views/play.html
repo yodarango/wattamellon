@@ -300,10 +300,12 @@
        * they submit the game
        **************************************************************************************** */
        if (gameSession && gameSession.id > 0 && gameSession.is_completed) {
-           lastGame.is_complete = true
-           lastGame.is_submitted = true
-         // Store it in localStorage with the key wattamellon_game
-         updateGameState(gameSession, `wattamellon_game_session_${gameId}`);
+           gameSession.is_complete = true
+           gameSession.is_submitted = true
+           // the answers come as a string, so we need to parse it
+           gameSession.answers = JSON.parse(gameSession.answers);
+          // Store it in localStorage with the key wattamellon_game
+          updateGameState(gameSession, `wattamellon_game_session_${gameSession.game_id}`);
        }
     </script>
   </head>
@@ -555,7 +557,7 @@
           });
 
           const successRate =
-            (correctAnswers / Object.keys(gameQuestions).length) * 100;
+            (correctAnswers / Object.keys(answers).length) * 100;
 
           if (!isComplete) {
             alert("Please answer all the questions before submitting");
@@ -703,9 +705,7 @@
             yourAnswer.innerHTML = `<strong>Your answer:</strong> ${selectedOption}`;
 
             const correctAnswer = document.createElement("p");
-            correctAnswer.innerHTML = `<strong>${
-              isCorrect ? "Correct!" : "Correct answer was:"
-            }</strong> ${creatorSelectOption}`;
+            correctAnswer.innerHTML = `<strong>Their answer:</strong> ${creatorSelectOption}`;
 
             accordionContent.appendChild(yourAnswer);
             accordionContent.appendChild(correctAnswer);

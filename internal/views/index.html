@@ -14,6 +14,8 @@
        if (lastGame && lastGame.id > 0 && lastGame.is_completed) {
            lastGame.is_complete = true
            lastGame.is_submitted = true
+           // questions come as a string, parse them
+            lastGame.questions = JSON.parse(lastGame.questions);
          // Store it in localStorage with the key wattamellon_game
          updateGameState(lastGame, "wattamellon_game");
        }
