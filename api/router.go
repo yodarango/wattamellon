@@ -166,7 +166,7 @@ func CompleteGame(w http.ResponseWriter, r *http.Request){
 		UPDATE games set questions = ?, is_complete = true WHERE id = ?;
 	`
 
-	result, err := RouterConfig.DB.Conn.Exec(query, game.Questions, game.ID)
+	_, err = RouterConfig.DB.Conn.Exec(query, game.Questions, game.ID)
 
 	if err != nil {
 		response.Error = fmt.Sprintf("error creating game %v", err)
@@ -177,11 +177,6 @@ func CompleteGame(w http.ResponseWriter, r *http.Request){
 		fmt.Println("Could not create game" ,err)
 		return
 	}
-
-	lastId, _ := result.LastInsertId()
-
-
-	game.ID = int(lastId)
 
 	response.Success = true
 	response.Data = game
