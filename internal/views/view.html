@@ -104,6 +104,14 @@
             width: 100%;
       }
 
+      .thumbnail{
+            width: 100%;
+            max-width: 20rem;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+      }
+
       /* nested accordion */
       .accordion-item-nested{
             padding: var(--dr-spacing-2);
@@ -170,8 +178,8 @@
   <body>
     <main>
       <section class="mb-4">
-            <h1>Game sessions for {{.Game.Name}}</h1>
-            <img src="/public/images/avatars/{{.Game.Thumbnail}}" alt="{{.Game.Name}}" />
+            <h1 class="mb-4 text-center">Game sessions for {{.Game.Name}}</h1>
+            <img src="/public/images/avatars/{{.Game.Thumbnail}}" alt="{{.Game.Name}}" class="thumbnail mb-4 d-block mx-auto" />
             <input type="text" value="" id="gameLink" readonly class="d-none" />
             <button onclick="copyLink()" class="btn-primary w-100 mb-2">Share Game Link</button>
             <button onclick="deleteGame()" class="btn-danger w-100">Delete Game</button>
@@ -231,7 +239,7 @@
         </div>
 
         {{else}}
-        <p>No players have played this game yet.</p>
+        <p class="text-center">No players have played this game yet.</p>
         {{end}}
       </div>
     

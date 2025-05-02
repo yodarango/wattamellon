@@ -533,7 +533,7 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 	// json.NewEncoder(w).Encode(response)
 
 	// add the response to the template
-	temp, err := template.ParseFiles("internal/views/view.html")
+	temp, err := template.ParseFiles("internal/views/view.html", "internal/views/_head.html")
 
 	if err != nil {
 		fmt.Println("Unable to parse file")
