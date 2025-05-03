@@ -69,9 +69,9 @@ The application uses local storage to maintain game state during creation and My
    docker compose up
    ```
 
-   This will start both the application in development mode (with hot reloading) and the MySQL database.
+   This will start both the application in development mode (with hot reloading) and the MySQL database. This is suitable for development and it is the default configuration.
 
-4. For database-only development, use:
+4. However, since the binary is executed as a service in production, only the database container is needed. For this the following command is used:
    ```
    docker compose -f ./docker-compose.db.yml --env-file ./.env up -d
    ```
