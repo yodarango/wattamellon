@@ -49,6 +49,7 @@ docker compose -f ./docker-compose.db.yml --env-file ./.env up -d \
 # start the service in /lib/systemd/system
 echo '🧼 Starting service now';\
 sudo systemctl restart wattamellon_shrood_app.service; \
+sudo systemctl status wattamellon_shrood_app.service;
 exit;
 "
 
