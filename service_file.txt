@@ -1,0 +1,15 @@
+[Unit]
+Description=Daniel Rangel website
+After=network.target
+
+[Service]
+ExecStart=/var/www/repos/danielrangel.net_v2/app/danielrangel_net --port=8002
+# WorkingDirectory=/var/www/repos/danielrangel.net_v2/app/
+User=root
+Group=root
+Restart=always
+RestartSec=3
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target

@@ -11,7 +11,7 @@ fi
 # The commit message is the first argument to the script
 COMMIT_MESSAGE="$1"
 
-# bbuild the binary for ubuntu 20.04
+# build the binary for ubuntu 20.04 (for reference only, not used in container)
 echo "🏰 Building binary for Ubuntu 20.04"
 GOOS=linux GOARCH=amd64 go build -o wattamellon
 
@@ -42,10 +42,14 @@ echo 'Current directory: '; pwd; \
 # Stop any existing containers that might be using port 3306
 docker ps | grep 3307 && docker stop \$(docker ps | grep 3306 | awk '{print \$1}'); \
 # Force remove any existing containers
-docker compose -f ./docker-compose.yml --env-file ./.env down --remove-orphans; \
-# restart the docker container
-echo '⛴️ Restarting docker container';\
-docker compose -f ./docker-compose.yml --env-file ./.env up -d
+docker compose -f ./docker-compose.db.yml --env-file ./.env down --remove-orphans; \
+# restart only the database container
+echo '⛴️ Restarting database container only';\
+docker compose -f ./docker-compose.db.yml --env-file ./.env up -d \
+# start the service in /lib/systemd/system
+echo '🧼 Starting service now';\
+sudo systemctl restart wattamellon_shrood_app.service; \
+exit;
 "
 
 echo "⭐️🚀✅ Deployment successful"
