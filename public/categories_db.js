@@ -980,7 +980,6 @@ const categories = {
       26: "Armadillo",
       27: "Squirrel",
       28: "Prairie Dog",
-      29: "Bald Eagle",
       30: "Hawk",
       31: "Owl",
       32: "Rattlesnake",

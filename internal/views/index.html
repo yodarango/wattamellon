@@ -69,7 +69,6 @@
         text-align: center;
         padding: var(--dr-spacing-4);
         aspect-ratio: 1/1;
-        font-size: 1.2rem;
         transition: all 0.2s ease;
       }
 
@@ -77,7 +76,6 @@
         background-color: rgba(var(--dr-alpha-rgb), 0.4);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         scale: 0.9;
-        color: var(--dr-beta);
         transform: translateY(-3px);
         transition: 300ms;
       }
@@ -239,7 +237,7 @@
     </style>
   </head>
   <body>
-    <header style="padding: 24px; display: flex; align-items: center">
+    <header>
       <a href="/" style="display: block">
         <img
           src="/public/images/wattamellon.png"
@@ -272,11 +270,11 @@
         <button
           type="button"
           onclick="openAvatarDialog()"
-          class="btn-secondary w-100"
+          class="btn btn-secondary w-100"
         >
           Select Avatar
         </button>
-        <button onclick="createGame()" class="btn-primary w-100">
+        <button onclick="createGame()" class="btn btn-primary w-100">
           Save Game
         </button>
 
@@ -511,6 +509,7 @@
           }
 
           const gameToken = getGameStateFromLocalStorage("wattamellon_game");
+
           const categorieKeys = Object.keys(categories).splice(0, size);
           // shuffle the categories so that the questions are not in the same order
           shuffleArray(categorieKeys);

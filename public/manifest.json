@@ -5,17 +5,17 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#f96b6f",
+  "theme_color": "#130e21",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/public/images/welcome_4000.webp",
+      "src": "/public/images/wattamellon_splash.png",
       "sizes": "192x192",
       "type": "image/webp",
       "purpose": "any"
     },
     {
-      "src": "/public/images/welcome_4000.webp",
+      "src": "/public/images/wattamellon_splash.png",
       "sizes": "512x512",
       "type": "image/webp",
       "purpose": "any"

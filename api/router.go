@@ -28,9 +28,9 @@ func Router () *http.ServeMux{
 	// GET
 	mux.HandleFunc("/", GetHomePage)
 	// GET
-	mux.HandleFunc("/play/", GetGameSession) // where the last item is the id of the game session
+	mux.HandleFunc("/play/", GetPlayPage) // where the last item is the id of the game session
 	// GET
-	mux.HandleFunc("/view/", GetGameSessionsByGameId) // where the last item is the id of the actual game
+	mux.HandleFunc("/view/", GetViewPage) // where the last item is the id of the actual game
 
 
 	return mux
@@ -370,7 +370,7 @@ func GetHomePage(w http.ResponseWriter, r *http.Request){
 }
 
 // Renders play.htmt, the user is playig the game
-func GetGameSession(w http.ResponseWriter, r *http.Request) {
+func GetPlayPage(w http.ResponseWriter, r *http.Request) {
 	var response HttpResponse
 	var gameSession GameSession
 	var game Game
@@ -451,7 +451,7 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 	// uncoment if i decide to make it an API
 	// json.NewEncoder(w).Encode(response)
 
-	temp, err := template.ParseFiles("internal/views/play.html", "internal/views/_head.html")
+	temp, err := template.ParseFiles("internal/views/play.html", "internal/views/_head.html", "internal/views/_footer.html")
 
 	if err != nil {
 		fmt.Println("Unable to parse file")
@@ -464,7 +464,7 @@ func GetGameSession(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
+func GetViewPage(w http.ResponseWriter, r *http.Request) {
 	var response HttpResponse
 	var game Game
 
@@ -584,15 +584,15 @@ func GetGameSessionsByGameId(w http.ResponseWriter, r *http.Request) {
 	// json.NewEncoder(w).Encode(response)
 
 	// add the response to the template
-	temp, err := template.ParseFiles("internal/views/view.html", "internal/views/_head.html")
+	temp, err := template.ParseFiles("internal/views/view.html", "internal/views/_head.html", "internal/views/_footer.html")
 
 	if err != nil {
-		fmt.Println("Unable to parse file")
+		fmt.Println("Unable to parse file", err)
 	}
 
 	err = temp.Execute(w, response.Data)
 
 	if err != nil {
-		fmt.Println("Unable to execute file")
+		fmt.Println("Unable to execute file", err)
 	}
 }
