@@ -1,10 +1,10 @@
 [Unit]
-Description=Daniel Rangel website
+Description=Wattermellon App Service
 After=network.target
 
 [Service]
-ExecStart=/var/www/repos/danielrangel.net_v2/app/danielrangel_net --port=8002
-# WorkingDirectory=/var/www/repos/danielrangel.net_v2/app/
+ExecStart=/var/www/repos/wattamellon.shrood.app/app/wattamellon
+WorkingDirectory=/var/www/repos/wattamellon.shrood.app/app/
 User=root
 Group=root
 Restart=always
