@@ -356,7 +356,7 @@ func GetHomePage(w http.ResponseWriter, r *http.Request){
 
 
 	// Parse the template files
-	temp, err := template.ParseFiles("internal/views/index.html", "internal/views/_head.html")
+	temp, err := template.ParseFiles("internal/views/index.html", "internal/views/_head.html", "internal/views/_footer.html")
 	if err != nil {
 		fmt.Println("Unable to parse file:", err)
 		return

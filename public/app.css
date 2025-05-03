@@ -2,5 +2,28 @@ main {
   width: 92%;
   max-width: 600px;
   margin: 0 auto;
-  padding-top: 5rem;
+}
+
+footer {
+  height: 20rem;
+  width: 100%;
+}
+
+.btn-primary {
+  background-color: var(--dr-delta);
+  color: var(--dr-alpha);
+  padding: 1.6rem 2rem;
+  border-radius: 2rem;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background-color: rgba(var(--dr-alpha-rgb), 0.2);
+  color: var(--dr-alpha);
+  display: block;
+  padding: 1.6rem 2rem;
+  border-radius: 2rem;
+  border: 0.1rem solid rgba(var(--dr-alpha-rgb), 0.25);
+  cursor: pointer;
 }

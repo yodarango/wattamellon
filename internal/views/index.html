@@ -107,25 +107,6 @@
         display: block;
       }
 
-      .btn-primary {
-        background-color: var(--dr-delta);
-        color: var(--dr-alpha);
-        padding: 1.6rem 2rem;
-        border-radius: 2rem;
-        border: none;
-        cursor: pointer;
-      }
-
-      .btn-secondary {
-        background-color: rgba(var(--dr-alpha-rgb), 0.2);
-        color: var(--dr-alpha);
-        display: block;
-        padding: 1.6rem 2rem;
-        border-radius: 2rem;
-        border: 0.1rem solid rgba(var(--dr-alpha-rgb), 0.25);
-        cursor: pointer;
-      }
-
       #avatar-dialog {
         display: none;
         position: fixed;
@@ -272,6 +253,13 @@
       <div id="create-form">
         <h1>Create a Game</h1>
         <img src="/public/images/welcome_4000.webp" class="thumbnail" />
+        <p class="mb-4 text-center">
+          This is a "this or that" game. Create a game, then choose the option
+          you prefer between two given choices. It doesn't mean you agree with
+          it, just that it's your preference. Once finished, you'll get a
+          shareable link for friends and family to answer the questions as
+          accurately as possible.
+        </p>
         <input type="text" id="name" placeholder="Game Name" />
         <input type="text" id="player_name" placeholder="Your Name" />
         <!-- Not allowing users to pick size for now -->
@@ -733,5 +721,6 @@
         }
       </script>
     </main>
+    {{template "footer"}}
   </body>
 </html>

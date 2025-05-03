@@ -350,6 +350,7 @@
 
       <!-- The user has finished and submitted the game. They will see the stats here-->
       <div id="game-container-submitted">
+        <a href="/" class="btn btn-secondary w-100 mb-4"> Create New Game </a>
         <h2>Results for {{.Game.Name}}</h2>
         <img src="/public/images/search_4000.webp" class="thumbnail" />
         <p>Here's how well you know {{.Game.PlayerName}}:</p>
@@ -785,5 +786,6 @@
         }
       </script>
     </main>
+    {{template "footer"}}
   </body>
 </html>
