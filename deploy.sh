@@ -13,7 +13,7 @@ COMMIT_MESSAGE="$1"
 
 # build the binary for ubuntu 20.04 (for reference only, not used in container)
 echo "🏰 Building binary for Ubuntu 20.04"
-GOOS=linux GOARCH=amd64 go build -o wattamellon
+GOOS=linux GOARCH=amd64 go build -o wattamellon ./cmd/main/main.go
 
 # Add changes to the staging area
 # You can adjust this to add specific files or use other git add options
