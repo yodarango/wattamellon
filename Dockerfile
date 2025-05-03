@@ -14,8 +14,7 @@ RUN go mod download
 COPY ./cmd/main ./cmd/main 
 COPY ./api ./api
 # COPY ./internal ./internal
-COPY ./config ./config
-# COPY ./web /app/web            
+COPY ./config ./config         
 
 # Install CompileDaemon
 RUN go install github.com/githubnemo/CompileDaemon@latest
