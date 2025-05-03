@@ -25,14 +25,12 @@ func main(){
 	dbConn := db.NewDBConnection(conn)
 
 	// set up the app config
-	err = godotenv.Load()
-
-	if err != nil {
-		log.Fatalf("error loading env %v", err)
-	}
+	// Try to load .env file, but don't fail if it doesn't exist
+	// This is useful in containerized environments where env vars are passed directly
+	_ = godotenv.Load()
 
 	env := os.Getenv("ENV")
-	port := os.Getenv("PORT")
+	port := os.Getenv("WEB_PORT")
 
 	appConfig := config.NewAppConfig(env)
 

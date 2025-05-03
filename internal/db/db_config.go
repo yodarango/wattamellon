@@ -17,10 +17,9 @@ type DBConfig struct {
 
 func DBConnection() (*sql.DB, error) {
 
-	err := godotenv.Load()
-	if err != nil {
-		return nil, fmt.Errorf("could not read env file \n %w", err)
-	}
+	// Try to load .env file, but don't fail if it doesn't exist
+	// This is useful in containerized environments where env vars are passed directly
+	_ = godotenv.Load()
 	// db constants
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbUser := os.Getenv("DB_USER")
@@ -33,12 +32,12 @@ func DBConnection() (*sql.DB, error) {
 
 	db, err := sql.Open("mysql", dsn)
 
-	// assicuarti che non avviano errori prima di continuare 
+	// assicuarti che non avviano errori prima di continuare
 	if err != nil {
 		return nil, fmt.Errorf("failed to start db: \n %w", err)
 	}
 
-	// Controlla che la DB sia funzionando 
+	// Controlla che la DB sia funzionando
 	err = db.Ping()
 	if err != nil {
 		return nil, fmt.Errorf("unable to ping db: \n %w", err)
