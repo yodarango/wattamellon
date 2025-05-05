@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  wattamellon_mysql:
+    image: mysql:8.0
+    container_name: wattamellon_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "${DB_PORT}:${MYSQL_DOCKER_PORT}"
+    networks:
+      - app-network
+    volumes:
+      - mysql_data:/var/lib/mysql # Persistent storage for MySQL data
+
+networks:
+  app-network:
+    driver: bridge
+volumes:
+  mysql_data:
+    driver: local

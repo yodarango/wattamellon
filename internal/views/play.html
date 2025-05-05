@@ -1,0 +1,791 @@
+<script>
+  /*************************************************************************************************
+   * This view is basically the same as the index view. The only difference is that the user is
+   * playing the game. The user will be able to select the answers to the questions and submit
+   * the game. The user will also be able to see the results of the game.
+   * *****************************************************************************/
+</script>
+<!DOCTYPE html>
+<html lang="en">
+  <style>
+    #game-container,
+    #game-container-done,
+    #game-container-submitted {
+      display: none;
+    }
+
+    #start-game-session {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.6rem;
+      text-align: center;
+      padding: 2rem 0;
+      margin: 2rem auto 0;
+    }
+
+    #start-game-session h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    #start-game-session input {
+      width: 100%;
+      border: 1px solid var(--dr-delta);
+      border-radius: 2rem;
+      padding: 1.6rem;
+      display: block;
+    }
+
+    #start-game-session button {
+      background-color: var(--dr-delta);
+      color: var(--dr-alpha);
+      padding: 1.6rem 2rem;
+      border-radius: 2rem;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    #game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 2rem;
+      padding: 2rem 0;
+      margin: 2rem auto 0;
+    }
+
+    #game-container h4 {
+      font-size: 1.2rem;
+      color: var(--dr-alpha);
+      opacity: 0.7;
+      margin: 0;
+    }
+
+    #game-container h3 {
+      font-size: 1.8rem;
+      margin: 0.5rem 0 1.5rem;
+      max-width: 90%;
+    }
+
+    .options-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      width: 100%;
+    }
+
+    .option-card {
+      background-color: rgba(var(--dr-alpha-rgb), 0.2);
+      color: var(--dr-alpha);
+      border: 0.1rem solid rgba(var(--dr-alpha-rgb), 0.25);
+      border-radius: 2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--dr-spacing-4);
+      aspect-ratio: 1/1;
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+    }
+
+    .option-card:hover {
+      background-color: rgba(var(--dr-alpha-rgb), 0.4);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      scale: 0.9;
+      color: var(--dr-beta);
+      transform: translateY(-3px);
+      transition: 300ms;
+    }
+
+    #game-container-done {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.6rem;
+      text-align: center;
+      padding: 2rem 0;
+      margin: 2rem auto 0;
+    }
+
+    #game-container-done h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    #game-container-done button {
+      background-color: var(--dr-delta);
+      color: var(--dr-alpha);
+      padding: 1.6rem 2rem;
+      border-radius: 2rem;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    #game-container-submitted {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.6rem;
+      text-align: center;
+      padding: 2rem 0;
+      margin: 2rem auto 0;
+    }
+
+    #game-container-submitted h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    #game-results {
+      width: 100%;
+      margin-top: 2rem;
+    }
+
+    #game-results h3 {
+      margin: 1.5rem 0 1rem;
+    }
+
+    /* Score summary styles */
+    .score-summary {
+      background-color: var(--dr-gamma);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    /* Pie chart styles */
+    .pie-chart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+
+    .pie-chart {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+
+    .pie-chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-color {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+
+    .correct-color {
+      background-color: var(--dr-success, #4caf50);
+    }
+
+    .incorrect-color {
+      background-color: var(--dr-danger, #ff5252);
+    }
+
+    .legend-label {
+      font-size: 0.9rem;
+    }
+
+    /* Accordion styles */
+    .accordion-container {
+      width: 100%;
+    }
+
+    .accordion-item {
+      margin-bottom: 1rem;
+      border-radius: 1rem;
+    }
+
+    .accordion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      border-radius: 1rem;
+    }
+
+    .accordion-icon {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .accordion-plus {
+      display: inline-block;
+    }
+
+    .accordion-minus {
+      display: none;
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.2s ease;
+      padding: 0 1.5rem;
+
+      p {
+        text-align: left;
+      }
+    }
+
+    .accordion-item.active .accordion-content {
+      padding-bottom: 1rem;
+      max-height: 20rem;
+    }
+
+    .accordion-item.active .accordion-plus {
+      display: none;
+    }
+
+    .accordion-item.active .accordion-minus {
+      display: inline-block;
+    }
+
+    .accordion-item.correct {
+      background-color: rgba(0, 200, 0, 0.1);
+      border: 1px solid rgba(0, 200, 0, 0.3);
+    }
+
+    .accordion-item.incorrect {
+      background-color: rgba(255, 0, 0, 0.1);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+    }
+
+    .thumbnail {
+      width: 100%;
+      max-width: 20rem;
+      margin: auto;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+    }
+  </style>
+  <head>
+    {{template "head" .}}
+
+    <script>
+      const gameSession = {{.SessionJson}};
+
+       /* ****************************************************************************************
+       * Do not update the state with the last game if the session has not been submitted, otherwise
+       * it will reset the progress because the actual question property is not stored until
+       * they submit the game
+       **************************************************************************************** */
+       if (gameSession && gameSession.id > 0 && gameSession.is_completed) {
+           gameSession.is_complete = true
+           gameSession.is_submitted = true
+           // the answers come as a string, so we need to parse it
+           gameSession.answers = JSON.parse(gameSession.answers);
+          // Store it in localStorage with the key wattamellon_game
+          updateGameState(gameSession, `wattamellon_game_session_${gameSession.game_id}`);
+       }
+    </script>
+  </head>
+  <body>
+    <header>
+      <a href="/" style="display: block">
+        <img
+          src="/public/images/wattamellon.png"
+          alt="Wattamellon Logo"
+          style="height: 50px; width: auto"
+        />
+      </a>
+    </header>
+    <main>
+      <!-- The user is starting an existing game  -->
+      <div id="start-game-session">
+        <h1 class="mb-2">Start Playing {{.Game.Name}}</h1>
+        <p class="mb-4">Created by {{.Game.PlayerName}}</p>
+        <input
+          type="text"
+          id="player_name"
+          placeholder="Your Name"
+          class="mb-4"
+        />
+        <!-- Not allowing users to pick size for now -->
+        <input type="hidden" id="gameId" value="{{.Game.ID}}" />
+        <button onclick="createGameSession()">Start Game</button>
+      </div>
+
+      <!-- The user has already started the game but has not finished it yet -->
+      <div id="game-container"></div>
+
+      <!-- The has been finished but not submitted  -->
+      <div id="game-container-done">
+        <h2>You have completed this game!</h2>
+        <img src="/public/images/thank_you_4000.webp" class="thumbnail" />
+        <p class="mb-4">
+          Submit your answers to see how well you know {{.Game.PlayerName}}.
+        </p>
+        <button onclick="submitGame()">Submit Answers</button>
+      </div>
+
+      <!-- The user has finished and submitted the game. They will see the stats here-->
+      <div id="game-container-submitted">
+        <a href="/" class="btn btn-secondary w-100 mb-4"> Create New Game </a>
+        <h2>Results for {{.Game.Name}}</h2>
+        <img src="/public/images/search_4000.webp" class="thumbnail" />
+        <p>Here's how well you know {{.Game.PlayerName}}:</p>
+        <div id="game-results"></div>
+      </div>
+
+      <script>
+        let gameId = "";
+
+        /*************************************************************************************************
+         * Four screens are possible:
+         * 1. Create a game player (default)
+         * 2. Play the game (the user ahs submitted the game player information)
+         * 3. Game is done (the user has answered all the questions but not submitted)
+         * 4. Game is submitted (the user has submitted the game)
+         * *****************************************************************************/
+        document.addEventListener("DOMContentLoaded", () => {
+          // Make sure gameId is available before checking localStorage
+          gameId = document.getElementById("gameId").value;
+
+          const gameSessionState = getGameStateFromLocalStorage(
+            `wattamellon_game_session_${gameId}`
+          );
+
+          if (gameSessionState.game_id) {
+            if (gameSessionState.is_submitted) {
+              updateFinalResults();
+
+              renderView("submitted");
+              return;
+            }
+
+            if (gameSessionState.is_complete) {
+              renderView("done");
+              return;
+            }
+
+            renderView("game");
+          } else {
+            renderView("create");
+          }
+        });
+
+        /*************************************************************************************************
+         * The new game session is created here. The user will be able to select the answers to the
+         * **********************************************************************************************/
+        async function createGameSession() {
+          const playerName = document.getElementById("player_name").value;
+          const gameId = document.getElementById("gameId").value;
+          const playerToken = getUserToken();
+
+          // alert the user if they have not selected a thumbnail or have not entered a name
+          if (!playerName) {
+            alert("Please enter your name");
+            return;
+          }
+
+          const res = await fetch("/new-game-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              player_token: playerToken,
+              player_name: playerName,
+              game_id: Number(gameId),
+              answers: "{}",
+            }),
+          });
+
+          const { data, success } = await res.json();
+
+          // get the questions from the game and set up an empty answer for each one to start with
+          const gameQuestions = `{{.Game.Questions}}`;
+          const gameQuestionsParsed = JSON.parse(gameQuestions);
+          const gameQuestionsKeys = Object.keys(gameQuestionsParsed);
+
+          const emtpyAnswers = gameQuestionsKeys.reduce((acc, key) => {
+            acc[key] = "";
+            return acc;
+          }, {});
+
+          if (success) {
+            // update the game token with the order of the questions
+            updateGameState(
+              {
+                player_token: data.player_token,
+                game_id: data.game_id,
+                answers: emtpyAnswers,
+                is_complete: false,
+                current_index: 0,
+                success_rate: 0,
+                id: data.id,
+              },
+              `wattamellon_game_session_${gameId}`
+            );
+            renderView("game");
+          } else {
+            alert("Error creating game: " + data.error);
+          }
+        }
+
+        /*************************************************************************************************
+         * I am responsible for three things:
+         * 1. Rendering the cards on the initial load
+         * 2. Rendering the next cards when the user selects one option
+         * 3. Updating the game token with the current game state
+         * **********************************************************************************************/
+        function renderCards() {
+          // get the game token from the local storage, so the state is preserved
+          const gameSessionState = getGameStateFromLocalStorage(
+            `wattamellon_game_session_${gameId}`
+          );
+
+          const categorieKeys = Object.keys(gameSessionState.answers);
+
+          // also get the current index of the game so we know which question to show
+          let currentIndex = gameSessionState.current_index;
+
+          // I need to append to this container the current question and the options
+          const container = document.getElementById("game-container");
+
+          function showNextQuestion() {
+            if (currentIndex >= categorieKeys.length) {
+              renderView("done");
+              return;
+            }
+
+            // based on the current index, get the current category key
+            const categoryKey = categorieKeys[currentIndex];
+
+            // based on the current category key, get the question
+            const { question, options } = categories[categoryKey];
+
+            // and also the options
+            const gameQuestions = `{{.Game.Questions}}`;
+            const selectedOptionsParsed = JSON.parse(gameQuestions);
+            const selectedOptions = selectedOptionsParsed[categoryKey].options;
+
+            container.innerHTML = "";
+
+            // Create question counter
+            const h4 = document.createElement("h4");
+            h4.textContent = `Question ${currentIndex + 1} of ${
+              categorieKeys.length
+            }`;
+            container.appendChild(h4);
+
+            // Create question text
+            const h3 = document.createElement("h3");
+            h3.textContent = question;
+            container.appendChild(h3);
+
+            // Create options container
+            const optionsContainer = document.createElement("div");
+            optionsContainer.className = "options-container";
+            container.appendChild(optionsContainer);
+
+            // when the user selects an option, also let them know if they are correct or not
+            selectedOptions.forEach((option) => {
+              const card = document.createElement("div");
+              card.className = "option-card";
+              card.textContent = option.value;
+              card.onclick = () => {
+                currentIndex++;
+                gameSessionState.answers[categoryKey] = {
+                  selection: option.id,
+                  isCorrect:
+                    option.id === selectedOptionsParsed[categoryKey].selection,
+                };
+                gameSessionState.current_index = currentIndex;
+                gameSessionState.is_complete =
+                  currentIndex >= categorieKeys.length;
+                updateGameState(
+                  gameSessionState,
+                  `wattamellon_game_session_${gameId}`
+                );
+                showNextQuestion();
+              };
+              optionsContainer.appendChild(card);
+            });
+          }
+
+          // call the function on initial load
+          showNextQuestion();
+        }
+
+        /*************************************************************************************************
+         * This function is responsible for submitting the game. It will send the answers to the server
+         * and if successful, it will alert the user and display the results
+         * **********************************************************************************************/
+        async function submitGame() {
+          // check that the user has answered all the questions
+
+          const gameSessionState = getGameStateFromLocalStorage(
+            `wattamellon_game_session_${gameId}`
+          );
+          const { player_token, id, answers } = gameSessionState;
+
+          // now, based on the answer values and the game questions, check the total number of questions
+          // answered correctly and incorrectly.
+          const gameQuestions = JSON.parse(`{{.Game.Questions}}`);
+          let incorrectAnswers = Object.keys(answers).filter(
+            (key) => answers[key].isCorrect === false
+          ).length;
+          let correctAnswers = Object.keys(answers).filter(
+            (key) => answers[key].isCorrect === true
+          ).length;
+
+          // check if the user has answered all the questions
+          let isComplete = true;
+          Object.keys(gameQuestions).forEach((key) => {
+            if (!answers[key]) {
+              isComplete = false;
+            }
+          });
+
+          const successRate =
+            (correctAnswers / Object.keys(answers).length) * 100;
+
+          if (!isComplete) {
+            alert("Please answer all the questions before submitting");
+            return;
+          }
+
+          const res = await fetch("/submit-game-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              answers: JSON.stringify(answers),
+              success_rate: successRate,
+              player_token,
+              id,
+            }),
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            updateGameState(
+              {
+                ...data,
+                is_complete: true,
+                is_submitted: true,
+                correct_answers: correctAnswers,
+                incorrect_answers: incorrectAnswers,
+              },
+              `wattamellon_game_session_${gameId}`
+            );
+
+            updateFinalResults();
+
+            alert("Game submitted! You can now view the results.");
+            renderView("submitted");
+          } else {
+            alert("Error submitting game.");
+          }
+        }
+
+        /*************************************************************************************************
+         * Update the results of the game. Show the total percentage as well as the correct and incorrect
+         * answers.
+         * **********************************************************************************************/
+        function updateFinalResults() {
+          const gameSessionState = getGameStateFromLocalStorage(
+            `wattamellon_game_session_${gameId}`
+          );
+          const { answers, success_rate, correct_answers, incorrect_answers } =
+            gameSessionState;
+
+          const resultsContainer = document.getElementById("game-results");
+
+          // game questions
+          const gameQuestions = `{{.Game.Questions}}`;
+          const gameQuestionsParsed = JSON.parse(gameQuestions);
+
+          // Calculate score percentage for display
+          const scorePercentage = Math.round(success_rate);
+          const totalQuestions = correct_answers + incorrect_answers;
+          const correctAngle = (correct_answers / totalQuestions) * 360;
+
+          // Create the score summary with pie chart
+          const scoreSummary = document.createElement("div");
+          scoreSummary.className = "score-summary";
+          scoreSummary.innerHTML = `
+            <h3>Your Score: ${scorePercentage}%</h3>
+            <div class="pie-chart-container">
+              <div class="pie-chart" id="results-pie-chart"></div>
+              <div class="pie-chart-legend">
+                <div class="legend-item">
+                  <span class="legend-color correct-color"></span>
+                  <span class="legend-label">Correct: ${correct_answers}</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color incorrect-color"></span>
+                  <span class="legend-label">Incorrect: ${incorrect_answers}</span>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Create the answer breakdown title
+          const breakdownTitle = document.createElement("h3");
+          breakdownTitle.textContent = "Answer Breakdown:";
+
+          // Create the accordion container
+          const accordionContainer = document.createElement("div");
+          accordionContainer.className = "accordion-container";
+
+          // Clear the results container and add the new elements
+          resultsContainer.innerHTML = "";
+          resultsContainer.appendChild(scoreSummary);
+          resultsContainer.appendChild(breakdownTitle);
+          resultsContainer.appendChild(accordionContainer);
+
+          // Get CSS variables for colors
+          const computedStyle = getComputedStyle(document.documentElement);
+          const successColor =
+            computedStyle.getPropertyValue("--dr-success") || "#4CAF50";
+          const dangerColor =
+            computedStyle.getPropertyValue("--dr-danger") || "#FF5252";
+
+          // Set the pie chart gradient using CSS variables
+          const pieChart = document.getElementById("results-pie-chart");
+          pieChart.style.backgroundImage = `conic-gradient(
+            ${successColor} 0deg ${correctAngle}deg,
+            ${dangerColor} ${correctAngle}deg 360deg
+          )`;
+
+          // Add each question as an accordion item
+          Object.keys(answers).forEach((key, index) => {
+            const question = categories[key].question;
+            const selectedOption =
+              categories[key]["options"][answers[key].selection];
+            const creatorSelectOption =
+              categories[key]["options"][gameQuestionsParsed[key].selection];
+            const isCorrect = answers[key].isCorrect;
+
+            const accordionItem = document.createElement("div");
+            accordionItem.className = `accordion-item ${
+              isCorrect ? "correct" : "incorrect"
+            }`;
+
+            const accordionHeader = document.createElement("div");
+            accordionHeader.className = "accordion-header";
+            accordionHeader.onclick = function () {
+              toggleAccordion(index);
+            };
+
+            const questionText = document.createElement("p");
+            questionText.textContent = question;
+
+            const accordionIcon = document.createElement("div");
+            accordionIcon.className = "accordion-icon";
+            accordionIcon.innerHTML =
+              '<span class="accordion-plus">+</span><span class="accordion-minus">−</span>';
+
+            accordionHeader.appendChild(questionText);
+            accordionHeader.appendChild(accordionIcon);
+
+            const accordionContent = document.createElement("div");
+            accordionContent.className = "accordion-content";
+
+            const yourAnswer = document.createElement("p");
+            yourAnswer.innerHTML = `<strong>Your answer:</strong> ${selectedOption}`;
+
+            const correctAnswer = document.createElement("p");
+            correctAnswer.innerHTML = `<strong>Their answer:</strong> ${creatorSelectOption}`;
+
+            accordionContent.appendChild(yourAnswer);
+            accordionContent.appendChild(correctAnswer);
+
+            accordionItem.appendChild(accordionHeader);
+            accordionItem.appendChild(accordionContent);
+
+            accordionContainer.appendChild(accordionItem);
+          });
+
+          // Add the toggle function for the accordion
+          window.toggleAccordion = function (index) {
+            const accordionItems = document.querySelectorAll(".accordion-item");
+            accordionItems[index].classList.toggle("active");
+          };
+        }
+
+        /*************************************************************************************************
+         * It will hide and show the right elements based on the view that is passed in
+         * **********************************************************************************************/
+        function renderView(view) {
+          switch (view) {
+            case "create":
+              document.getElementById("start-game-session").style.display =
+                "block";
+              document.getElementById("game-container").style.display = "none";
+              document.getElementById("game-container-done").style.display =
+                "none";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "none";
+              break;
+            case "game":
+              document.getElementById("start-game-session").style.display =
+                "none";
+              document.getElementById("game-container").style.display = "block";
+              document.getElementById("game-container-done").style.display =
+                "none";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "none";
+              renderCards();
+              break;
+            case "done":
+              document.getElementById("start-game-session").style.display =
+                "none";
+              document.getElementById("game-container").style.display = "none";
+              document.getElementById("game-container-done").style.display =
+                "block";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "none";
+              break;
+
+            case "submitted":
+              document.getElementById("start-game-session").style.display =
+                "none";
+              document.getElementById("game-container").style.display = "none";
+              document.getElementById("game-container-done").style.display =
+                "none";
+              document.getElementById(
+                "game-container-submitted"
+              ).style.display = "block";
+
+            default:
+              break;
+          }
+        }
+      </script>
+    </main>
+    {{template "footer"}}
+  </body>
+</html>
