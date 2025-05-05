@@ -48,15 +48,36 @@ type Game struct {
 	IsCompleted  bool      `json:"is_completed"`
 }
 
+// FloatToInt è un tipo personalizzato che può accettare sia numeri interi che decimali
+// durante l'unmarshalling JSON, convertendoli in int
+type FloatToInt int
+
+// UnmarshalJSON implementa l'interfaccia json.Unmarshaler
+func (fi *FloatToInt) UnmarshalJSON(data []byte) error {
+	var floatValue float64
+	if err := json.Unmarshal(data, &floatValue); err == nil {
+		*fi = FloatToInt(int(floatValue))
+		return nil
+	}
+
+	var intValue int
+	if err := json.Unmarshal(data, &intValue); err != nil {
+		return err
+	}
+
+	*fi = FloatToInt(intValue)
+	return nil
+}
+
 type GameSession struct {
-	ID          int       `json:"id"`
-	GameID      int       `json:"game_id"`
-	PlayerToken string    `json:"player_token"`
-	Answers     string    `json:"answers"`
-	IsCompleted bool      `json:"is_completed"`
-	SuccessRate int       `json:"success_rate"`
-	PlayerName   string    `json:"player_name"`
-	Created     string    `json:"created"`
+	ID          int         `json:"id"`
+	GameID      int         `json:"game_id"`
+	PlayerToken string      `json:"player_token"`
+	Answers     string      `json:"answers"`
+	IsCompleted bool        `json:"is_completed"`
+	SuccessRate FloatToInt  `json:"success_rate"`
+	PlayerName  string      `json:"player_name"`
+	Created     string      `json:"created"`
 }
 
 type HttpResponse struct{
@@ -286,7 +307,7 @@ func SubmitGameSession(w http.ResponseWriter, r *http.Request) {
 		WHERE id = ? AND player_token = ? ;
 	`
 
-	_, err = RouterConfig.DB.Conn.Exec(query, gameSession.SuccessRate, gameSession.Answers, gameSession.ID, gameSession.PlayerToken)
+	_, err = RouterConfig.DB.Conn.Exec(query, int(gameSession.SuccessRate), gameSession.Answers, gameSession.ID, gameSession.PlayerToken)
 
 	if err != nil {
 		response.Error = fmt.Sprintf("error creating game %v", err)
